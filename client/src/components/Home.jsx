@@ -1,9 +1,10 @@
 import Header from "./Header";
 import Footer from "./Footer";
+import React from "react";
 
-function Home() {
+function Home(props) {
   return (
-    <div>
+    <div className="container">
       <Header />
 
       <h1>Home</h1>
@@ -22,7 +23,7 @@ function Home() {
 
       {/* <%  posts.forEach(function(post){ %>
 
-<h1><%=post.title%></h1>
+<h1>props.title</h1>
 <p>
 <%=post.content.substring(0, 100) + " ..."%>
 <a href="/posts/<%=post._id%>">Read More</a>

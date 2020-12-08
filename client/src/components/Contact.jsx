@@ -1,9 +1,10 @@
 import Header from "./Header";
 import Footer from "./Footer";
+import React from "react";
 
 function Contact() {
   return (
-    <div>
+    <div className="container">
       <Header />
       <h1>Contact</h1>
       <p>

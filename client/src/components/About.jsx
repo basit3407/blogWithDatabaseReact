@@ -1,9 +1,10 @@
 import Header from "./Header";
 import Footer from "./Footer";
+import React from "react";
 
 function About() {
   return (
-    <div>
+    <div className="container">
       <Header />
       <h1>About</h1>
       <p>

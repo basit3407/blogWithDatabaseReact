@@ -1,9 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const port = 5000;
 
 const app = express();
+
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -18,6 +21,12 @@ const postSchema = {
 };
 
 const Post = mongoose.model("Post", postSchema);
+
+app.post("/", (req, res) => {
+  const newPost = req.body;
+  console.log(newPost);
+  res.json("post added");
+});
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
