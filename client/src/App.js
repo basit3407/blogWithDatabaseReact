@@ -16,20 +16,19 @@ function App() {
     axios.post(url, post).then((res) => console.log(res.data));
   }
 
-  //   useEffect(() => axios.get(url).then((res) => setPosts(res.data)));
+  useEffect(() => axios.get(url).then((res) => setPosts(res.data)));
 
   return (
     <main>
       <Switch>
-        <Route path="/" component={Home} exact />
+        <Route
+          exact
+          path="/"
+          render={(props) => <Home {...props} posts={posts} />}
+        />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
-        <Route
-          path="/post"
-          render={(props) => (
-            <Post {...props} title={posts.title} content={posts.content} />
-          )}
-        />
+        <Route path="/post/:postTitle" />
         <Route
           path="/compose"
           render={(props) => <Compose {...props} onSubmit={onSubmit} />}

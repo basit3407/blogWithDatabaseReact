@@ -24,8 +24,31 @@ const Post = mongoose.model("Post", postSchema);
 
 app.post("/", (req, res) => {
   const newPost = req.body;
-  console.log(newPost);
-  res.json("post added");
+
+  const post = new Post({
+    title: newPost.title,
+    content: newPost.content,
+  });
+  post.save();
+  res.json("user added");
+});
+
+app.get("/posts/:postId", function (req, res) {
+  const requestedPostId = req.params.postId;
+
+  Post.findOne({ _id: requestedPostId }, function (err, post) {
+    if (!err) {
+      res.json(post);
+    }
+  });
+});
+
+app.get("/", (req, res) => {
+  Post.find((err, results) => {
+    if (!err) {
+      res.json(results);
+    }
+  });
 });
 
 const db = mongoose.connection;

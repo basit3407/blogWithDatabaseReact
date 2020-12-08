@@ -1,6 +1,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Home(props) {
   return (
@@ -21,16 +22,17 @@ function Home(props) {
         iaculis at erat pellentesque adipiscing.
       </p>
 
-      {/* <%  posts.forEach(function(post){ %>
-
-<h1>props.title</h1>
-<p>
-<%=post.content.substring(0, 100) + " ..."%>
-<a href="/posts/<%=post._id%>">Read More</a>
-</p>
-
-
-<% }) %> */}
+      {props.posts.map((post) => {
+        return (
+          <div>
+            <h1>{post.title}</h1>
+            <p>
+              {post.content.substring(0, 100) + " ..."}
+              <Link to={"/post/" + post.title}>Read more</Link>
+            </p>
+          </div>
+        );
+      })}
 
       <Footer />
     </div>
