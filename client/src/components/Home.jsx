@@ -1,9 +1,16 @@
 import Header from "./Header";
 import Footer from "./Footer";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Home(props) {
+  const [posts, setPosts] = useState([]);
+
+  const url = "http://localhost:5000/";
+
+  useEffect(() => axios.get(url).then((res) => setPosts(res.data)), []);
+
   return (
     <div className="container">
       <Header />
@@ -22,9 +29,9 @@ function Home(props) {
         iaculis at erat pellentesque adipiscing.
       </p>
 
-      {props.posts.map((post) => {
+      {posts.map((post, index) => {
         return (
-          <div>
+          <div key={index}>
             <h1>{post.title}</h1>
             <p>
               {post.content.substring(0, 100) + " ..."}

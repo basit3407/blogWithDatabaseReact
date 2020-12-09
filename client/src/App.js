@@ -1,39 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
 import Home from "./components/Home";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Post from "./components/Post";
 import Compose from "./components/Compose";
-import axios from "axios";
+import Error from "./components/Error";
 
 function App() {
-  const [posts, setPosts] = useState([]);
-
-  const url = "http://localhost:5000/";
-
-  function onSubmit(post) {
-    axios.post(url, post).then((res) => console.log(res.data));
-  }
-
-  useEffect(() => axios.get(url).then((res) => setPosts(res.data)));
-
   return (
     <main>
       <Switch>
-        <Route
-          exact
-          path="/"
-          render={(props) => <Home {...props} posts={posts} />}
-        />
-        <Route path="/about" component={About} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/post/:postTitle" />
-        <Route
-          path="/compose"
-          render={(props) => <Compose {...props} onSubmit={onSubmit} />}
-        />
-        <Route component={Error} />
+        <Route exact path="/" component={Home} />
+        <Route path="/about" exact component={About} />
+        <Route path="/contact" exact component={Contact} />
+        <Route path="/post/:postTitle" component={Post} />
+        <Route path="/compose" exact component={Compose} />
+        <Route path="*" component={Error} />
       </Switch>
     </main>
   );

@@ -33,12 +33,17 @@ app.post("/", (req, res) => {
   res.json("user added");
 });
 
-app.get("/posts/:postId", function (req, res) {
-  const requestedPostId = req.params.postId;
-
-  Post.findOne({ _id: requestedPostId }, function (err, post) {
+app.get("/post/:postTitle", function (req, res) {
+  const requestedPostTitle = req.params;
+  Post.findOne({ title: requestedPostTitle.postTitle }, function (err, post) {
     if (!err) {
-      res.json(post);
+      if (!post) {
+        res.status(404).send("Not found");
+      } else {
+        res.json(post);
+      }
+    } else {
+      console.log(err);
     }
   });
 });
