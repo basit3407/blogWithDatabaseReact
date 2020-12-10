@@ -25,12 +25,22 @@ const Post = mongoose.model("Post", postSchema);
 app.post("/", (req, res) => {
   const newPost = req.body;
 
-  const post = new Post({
-    title: newPost.title,
-    content: newPost.content,
+  Post.findOne({ title: newPost.title }, (err, post) => {
+    if (!err) {
+      if (!post) {
+        const post = new Post({
+          title: newPost.title,
+          content: newPost.content,
+        });
+        post.save();
+        res.json("user added");
+      } else {
+        res.status(409).send("Title already exisits");
+      }
+    } else {
+      console.log(err);
+    }
   });
-  post.save();
-  res.json("user added");
 });
 
 app.get("/post/:postTitle", function (req, res) {

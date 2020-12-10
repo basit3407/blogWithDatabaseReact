@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-function Home(props) {
+function Home() {
   const [posts, setPosts] = useState([]);
 
   const url = "http://localhost:5000/";
 
-  useEffect(() => axios.get(url).then((res) => setPosts(res.data)), []);
+  useEffect(() => axios.get(url).then((res) => setPosts(res.data)), [posts]);
 
   return (
     <div className="container">

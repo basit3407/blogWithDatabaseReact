@@ -4,12 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Redirect, useParams } from "react-router";
 import axios from "axios";
 import Error from "./Error";
-// import Error from "./Error"
 
 function Post() {
   const [selectedPost, setSelectedPost] = useState({});
   const [error, setError] = useState(null);
-  // const [error404, setError404] = useState(false);
   const { postTitle } = useParams();
 
   useEffect(() => {
@@ -26,16 +24,11 @@ function Post() {
         console.error(err.response.headers); // ***
         setError(err.response.status);
       });
-    // .then(() => {
-    //   if (error === 404) {
-    //     setError404(true);
-    //   }
-    // });
-  }, [postTitle]);
+  }, [error, postTitle]);
 
   return (
     <main>
-      {error && <Redirect to="Error404" component={Error} />}
+      {error && <Redirect to="/Error404" component={Error} />}
       <div className="container">
         <Header />
         <h1>{selectedPost.title}</h1>

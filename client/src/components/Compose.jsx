@@ -6,17 +6,27 @@ import { Redirect } from "react-router";
 
 function Compose() {
   const [post, setPost] = useState({ title: "", content: "" });
-  const [isDone, setisDone] = useState(false);
   const [isSubmitted, setISSubmitted] = useState(false);
 
   function handleSubmit(event) {
     axios
       .post("http://localhost:5000/", post)
-      .then((res) => console.log(res.data));
+      .then((res) => {
+        console.log(res.data);
+        setISSubmitted(true);
+        setPost({ title: "", content: "" });
+      })
+      .catch((err) => {
+        console.error("Error response:");
+        console.error(err.response.data); // ***
+        console.error(err.response.status); // ***
+        console.error(err.response.headers); // ***
+        if (err.response.status === 409) {
+          alert("Sorry this title already exisits. please choose new title");
+        }
+      });
+
     event.preventDefault();
-    setPost({ title: "", content: "" });
-    setisDone(false);
-    setISSubmitted(true);
   }
 
   function handleChange(event) {
@@ -37,23 +47,21 @@ function Compose() {
         <Header />
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            {isDone && <label>Title</label>}
-            {isDone && (
-              <input
-                onChange={handleChange}
-                className="form-control"
-                name="title"
-                value={post.title}
-              ></input>
-            )}
+            <label>Title</label>
+
+            <input
+              onChange={handleChange}
+              className="form-control"
+              name="title"
+              value={post.title}
+            ></input>
 
             <label>Post</label>
             <textarea
-              onClick={() => setisDone(true)}
               onChange={handleChange}
               className="form-control"
               name="content"
-              rows={isDone ? "5" : "1"}
+              rows="5"
               cols="30"
               value={post.content}
             ></textarea>
