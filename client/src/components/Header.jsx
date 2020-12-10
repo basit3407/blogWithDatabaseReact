@@ -1,6 +1,6 @@
 function Header() {
   return (
-    <div>
+    <main>
       <nav className="navbar navbar-default">
         <div className="container">
           <div className="navbar-header">
@@ -19,7 +19,7 @@ function Header() {
           </ul>
         </div>
       </nav>
-    </div>
+    </main>
   );
 }
 

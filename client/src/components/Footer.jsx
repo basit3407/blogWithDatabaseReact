@@ -1,11 +1,11 @@
 function Footer() {
   return (
-    <div>
+    <main>
       <div className="footer-padding"></div>
       <div className="footer">
         <p>Made with ❤️ by BM</p>
       </div>
-    </div>
+    </main>
   );
 }
 

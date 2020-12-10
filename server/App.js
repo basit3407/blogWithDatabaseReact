@@ -58,6 +58,17 @@ app.get("/post/:postTitle", function (req, res) {
   });
 });
 
+app.delete("/post/:postId", (req, res) => {
+  const posttobeDeletedId = req.params.postId;
+  Post.findByIdAndDelete(posttobeDeletedId, (err) => {
+    if (!err) {
+      res.json("post deleted");
+    } else {
+      console.log(err);
+    }
+  });
+});
+
 app.get("/", (req, res) => {
   Post.find((err, results) => {
     if (!err) {
