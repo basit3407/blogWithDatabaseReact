@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 mongoose.connect(
   "mongodb+srv://basit3407:Kmha@3407@cluster0.rpbol.mongodb.net/blogdbDatabase?retryWrites=true&w=majority",
-  { useNewUrlParser: true, useUnifiedTopology: true }
+  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
 );
 
 const postSchema = {
@@ -37,6 +37,69 @@ app.post("/", (req, res) => {
       } else {
         res.status(409).send("Title already exisits");
       }
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+app.post("/duplicatetitle", (req) => {
+  const duplicatePost = new Post({
+    title: req.body.title,
+    content: req.body.content,
+  });
+  duplicatePost.save();
+});
+
+app.put("/", (req, res) => {
+  const editedPost = req.body;
+  // console.log(editedPost);
+
+  Post.findById(editedPost._id, (err, post) => {
+    if (!err) {
+      // // Find if this title already exsists
+
+      Post.find({ title: editedPost.title }, (error, docs) => {
+        if (!error) {
+          if (!docs) {
+            post.title = editedPost.title;
+            post.content = editedPost.content;
+            post.save();
+          } else {
+            //
+            res.status(409).send("Conflict");
+          }
+        } else console.log(error);
+      });
+    }
+  });
+});
+
+app.put("/duplicatetitle", (req, res) => {
+  const editedPost = req.body;
+  console.log(editedPost);
+
+  Post.findByIdAndUpdate(
+    editedPost._id,
+    { title: editedPost.title, content: editedPost.content },
+    { new: true },
+
+    (err) => {
+      if (!err) {
+        res.json("post updated");
+      } else {
+        console.log(err);
+      }
+    }
+  );
+});
+
+app.get("/:id", (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  Post.findById(id, (err, editedPost) => {
+    if (!err) {
+      res.json(editedPost);
     } else {
       console.log(err);
     }

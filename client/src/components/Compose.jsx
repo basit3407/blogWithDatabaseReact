@@ -3,6 +3,8 @@ import Footer from "./Footer";
 import React, { useState } from "react";
 import axios from "axios";
 import { Redirect } from "react-router";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 function Compose() {
   const [post, setPost] = useState({ title: "", content: "" });
@@ -11,18 +13,34 @@ function Compose() {
   function handleSubmit(event) {
     axios
       .post("http://localhost:5000/", post)
-      .then((res) => {
-        console.log(res.data);
+      .then(() => {
         setISSubmitted(true);
         setPost({ title: "", content: "" });
       })
       .catch((err) => {
-        console.error("Error response:");
-        console.error(err.response.data); // ***
-        console.error(err.response.status); // ***
-        console.error(err.response.headers); // ***
         if (err.response.status === 409) {
-          alert("Sorry this title already exisits. please choose new title");
+          confirmAlert({
+            title: "Confirm to Submit",
+            message:
+              "This title alredy exisits, Do you still want to submit it??",
+            buttons: [
+              {
+                label: "Yes",
+                onClick: () => {
+                  axios
+                    .post("http://localhost:5000/duplicatetitle", post)
+                    .then((res) => {
+                      console.log(res.data);
+                      setISSubmitted(true);
+                    });
+                },
+              },
+              {
+                label: "No",
+                onClick: () => setISSubmitted(false),
+              },
+            ],
+          });
         }
       });
 
