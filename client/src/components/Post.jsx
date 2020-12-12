@@ -1,6 +1,6 @@
 import Header from "./Header";
 import Footer from "./Footer";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Redirect, useParams } from "react-router";
 import axios from "axios";
 import Error from "./Error";
@@ -25,7 +25,6 @@ export function IconLabelButtons() {
 
 function Post() {
   const [selectedPost, setSelectedPost] = useState({});
-  // const [editedPost, setEditedPost] = useState({ title: "", content: "" });
   const [error, setError] = useState(null);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
@@ -56,8 +55,6 @@ function Post() {
 
   function handleChange(event) {
     const { name, value } = event.target;
-    console.log(name);
-    console.log(value);
 
     setSelectedPost((prevPost) => {
       return {
@@ -71,57 +68,64 @@ function Post() {
     setEditClicked(true);
   }
 
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
+
+  const previousValue = usePrevious(selectedPost);
+
   function handleClickUpdate() {
-    axios
-      .put(`http://localhost:5000/`, selectedPost)
-      .then((res) => {
-        console.log(res.data);
-
-        axios
-          .get(`http://localhost:5000/${selectedPost._id}`)
-          .then((editedPost) => {
-            console.log(editedPost.data);
-            setSelectedPost(editedPost.data);
-            setEditClicked(false);
-          });
-      })
-      .catch((err) => {
-        console.error("Error response:");
-        console.error(err.response.data); // ***
-        console.error(err.response.status); // ***
-        console.error(err.response.headers); // ***
-        if (err.response.status === 409) {
-          confirmAlert({
-            title: "Confirm to Submit",
-            message:
-              "This title alredy exisits, Do you still want to submit it??",
-            buttons: [
-              {
-                label: "Yes",
-                onClick: () => {
-                  axios
-                    .put("http://localhost:5000/duplicatetitle", selectedPost)
-                    .then((res) => {
-                      console.log(res.data);
-
-                      axios
-                        .get(`http://localhost:5000/${selectedPost._id}`)
-                        .then((editedPost) => {
-                          console.log(editedPost.data);
-                          setSelectedPost(editedPost.data);
-                          setEditClicked(false);
-                        });
-                    });
+    // if title same no action
+    if (previousValue !== selectedPost) {
+      axios
+        .put(`http://localhost:5000/`, selectedPost)
+        .then(() => {
+          axios
+            .get(`http://localhost:5000/updatepost/${selectedPost._id}`)
+            .then((editedPost) => {
+              setSelectedPost(editedPost.data);
+              setEditClicked(false);
+            });
+        })
+        .catch((err) => {
+          if (err.response.status === 409) {
+            confirmAlert({
+              title: "Confirm to Submit",
+              message:
+                "This title alredy exisits, Do you still want to submit it??",
+              buttons: [
+                {
+                  label: "Yes",
+                  onClick: () => {
+                    axios
+                      .put("http://localhost:5000/duplicatetitle", selectedPost)
+                      .then((res) => {
+                        axios
+                          .get(
+                            `http://localhost:5000/updatepost/${selectedPost._id}`
+                          )
+                          .then((editedPost) => {
+                            setSelectedPost(editedPost.data);
+                            setEditClicked(false);
+                          });
+                      });
+                  },
                 },
-              },
-              {
-                label: "No",
-                onClick: () => setEditClicked(true),
-              },
-            ],
-          });
-        }
-      });
+                {
+                  label: "No",
+                  onClick: () => setEditClicked(true),
+                },
+              ],
+            });
+          }
+        });
+    } else {
+      setEditClicked(false);
+    }
   }
 
   useEffect(() => {
@@ -129,13 +133,8 @@ function Post() {
       .get(`http://localhost:5000/post/${postTitle}`)
       .then((res) => {
         setSelectedPost(res.data);
-        console.log(res);
       })
       .catch((err) => {
-        console.error("Error response:");
-        console.error(err.response.data); // ***
-        console.error(err.response.status); // ***
-        console.error(err.response.headers); // ***
         setError(err.response.status);
       });
   }, [error, postTitle]);
@@ -149,7 +148,6 @@ function Post() {
         <h1>
           <input
             onChange={handleChange}
-            // value={editClicked ? editClicked.title : selectedPost.title}
             value={selectedPost.title}
             style={{ border: "none", resize: "none" }}
             disabled={editClicked ? false : true}

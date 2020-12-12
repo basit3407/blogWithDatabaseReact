@@ -22,6 +22,16 @@ const postSchema = {
 
 const Post = mongoose.model("Post", postSchema);
 
+function updatePost(post, cb) {
+  Post.find({ title: post.title }, (err, docs) => {
+    if (!err && docs.length) {
+      cb(null, post, docs);
+    } else {
+      post.save((err) => cb(err, post, null));
+    }
+  });
+}
+
 app.post("/", (req, res) => {
   const newPost = req.body;
 
@@ -33,12 +43,10 @@ app.post("/", (req, res) => {
           content: newPost.content,
         });
         post.save();
-        res.json("user added");
+        res.json("post added");
       } else {
         res.status(409).send("Title already exisits");
       }
-    } else {
-      console.log(err);
     }
   });
 });
@@ -52,24 +60,26 @@ app.post("/duplicatetitle", (req) => {
 });
 
 app.put("/", (req, res) => {
-  const editedPost = req.body;
-  // console.log(editedPost);
+  Post.findById(req.body._id, (err, existingPost) => {
+    if (!err && existingPost) {
+      existingPost.title = req.body.title;
+      existingPost.content = req.body.content;
+      updatePost(existingPost, (err2, post, docs) => {
+        if (docs) {
+          const check = docs.filter((doc) => !doc._id.equals(post._id));
 
-  Post.findById(editedPost._id, (err, post) => {
-    if (!err) {
-      // // Find if this title already exsists
-
-      Post.find({ title: editedPost.title }, (error, docs) => {
-        if (!error) {
-          if (!docs) {
-            post.title = editedPost.title;
-            post.content = editedPost.content;
-            post.save();
+          if (check.length || err2) {
+            res.status(409).send("post already exist");
           } else {
-            //
-            res.status(409).send("Conflict");
+            post.save().then(() => res.json("post updated"));
           }
-        } else console.log(error);
+        } else {
+          if (err2) {
+            res.status(409).send("post already exist");
+          } else {
+            res.json("post updated");
+          }
+        }
       });
     }
   });
@@ -77,7 +87,6 @@ app.put("/", (req, res) => {
 
 app.put("/duplicatetitle", (req, res) => {
   const editedPost = req.body;
-  console.log(editedPost);
 
   Post.findByIdAndUpdate(
     editedPost._id,
@@ -86,22 +95,18 @@ app.put("/duplicatetitle", (req, res) => {
 
     (err) => {
       if (!err) {
-        res.json("post updated");
-      } else {
-        console.log(err);
+        res.json("duplicate post updated");
       }
     }
   );
 });
 
-app.get("/:id", (req, res) => {
+app.get("/updatepost/:id", (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   Post.findById(id, (err, editedPost) => {
     if (!err) {
       res.json(editedPost);
-    } else {
-      console.log(err);
     }
   });
 });
@@ -115,8 +120,6 @@ app.get("/post/:postTitle", function (req, res) {
       } else {
         res.json(post);
       }
-    } else {
-      console.log(err);
     }
   });
 });
@@ -126,8 +129,6 @@ app.delete("/post/:postId", (req, res) => {
   Post.findByIdAndDelete(posttobeDeletedId, (err) => {
     if (!err) {
       res.json("post deleted");
-    } else {
-      console.log(err);
     }
   });
 });

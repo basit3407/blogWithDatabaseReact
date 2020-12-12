@@ -30,7 +30,6 @@ function Compose() {
                   axios
                     .post("http://localhost:5000/duplicatetitle", post)
                     .then((res) => {
-                      console.log(res.data);
                       setISSubmitted(true);
                     });
                 },
