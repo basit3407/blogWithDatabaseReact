@@ -9,12 +9,22 @@ function Home() {
 
   const url = "http://localhost:5000/";
 
-  useEffect(() => axios.get(url).then((res) => setPosts(res.data)), [posts]);
+  useEffect(() => {
+    let isMounted = true;
+    axios.get(url).then((res) => {
+      if (isMounted) {
+        setPosts(res.data);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [posts]);
 
   return (
     <div className="container">
       <Header />
-
+      {/*  */}
       <h1>Home</h1>
       <p>
         Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper

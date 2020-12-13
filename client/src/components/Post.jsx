@@ -24,7 +24,12 @@ export function IconLabelButtons() {
 }
 
 function Post() {
-  const [selectedPost, setSelectedPost] = useState({});
+  const [selectedPost, setSelectedPost] = useState({
+    title: "",
+    content: "",
+    _id: "",
+    _v: "",
+  });
   const [error, setError] = useState(null);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
@@ -103,7 +108,7 @@ function Post() {
                   onClick: () => {
                     axios
                       .put("http://localhost:5000/duplicatetitle", selectedPost)
-                      .then((res) => {
+                      .then(() => {
                         axios
                           .get(
                             `http://localhost:5000/updatepost/${selectedPost._id}`
@@ -137,7 +142,7 @@ function Post() {
       .catch((err) => {
         setError(err.response.status);
       });
-  }, [error, postTitle]);
+  }, [postTitle]);
 
   return (
     <main>

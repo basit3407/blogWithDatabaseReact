@@ -9,6 +9,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use("/public", express.static("public"));
 
 mongoose.connect(
   "mongodb+srv://basit3407:Kmha@3407@cluster0.rpbol.mongodb.net/blogdbDatabase?retryWrites=true&w=majority",
@@ -42,8 +43,7 @@ app.post("/", (req, res) => {
           title: newPost.title,
           content: newPost.content,
         });
-        post.save();
-        res.json("post added");
+        post.save().then(() => res.json("post added"));
       } else {
         res.status(409).send("Title already exisits");
       }
@@ -51,12 +51,12 @@ app.post("/", (req, res) => {
   });
 });
 
-app.post("/duplicatetitle", (req) => {
+app.post("/duplicatetitle", (req, res) => {
   const duplicatePost = new Post({
     title: req.body.title,
     content: req.body.content,
   });
-  duplicatePost.save();
+  duplicatePost.save().then(() => res.json("duplicate post added"));
 });
 
 app.put("/", (req, res) => {

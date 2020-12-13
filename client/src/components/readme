@@ -3,6 +3,9 @@ Authenticate
 check is we can respons back with put statemnent instead of get.w
 what are good practicess and standars? for put and get.
 
+
+css and other settings like changing "a" to "link"
+resolve controlled components error on front end. stackoverflow book marked in react packages
 edit
 refractor code
 comment code

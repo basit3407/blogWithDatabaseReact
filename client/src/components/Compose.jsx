@@ -15,7 +15,6 @@ function Compose() {
       .post("http://localhost:5000/", post)
       .then(() => {
         setISSubmitted(true);
-        setPost({ title: "", content: "" });
       })
       .catch((err) => {
         if (err.response.status === 409) {
@@ -29,7 +28,7 @@ function Compose() {
                 onClick: () => {
                   axios
                     .post("http://localhost:5000/duplicatetitle", post)
-                    .then((res) => {
+                    .then(() => {
                       setISSubmitted(true);
                     });
                 },
