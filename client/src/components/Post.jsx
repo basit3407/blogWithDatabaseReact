@@ -3,7 +3,7 @@ import Footer from "./Footer";
 import React, { useEffect, useState, useRef } from "react";
 import { Redirect, useParams } from "react-router";
 import axios from "axios";
-import Error from "./Error";
+// import Error from "./Error";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -23,17 +23,18 @@ export function IconLabelButtons() {
   return classes;
 }
 
-function Post() {
+function Post(props) {
   const [selectedPost, setSelectedPost] = useState({
     title: "",
     content: "",
     _id: "",
     _v: "",
   });
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
   const { postTitle } = useParams();
+  const { handleError } = props;
 
   function handleClickDelete() {
     confirmAlert({
@@ -47,6 +48,9 @@ function Post() {
               .delete(`http://localhost:5000/post/${selectedPost._id}`)
               .then(() => {
                 setDeleteClicked(true);
+              })
+              .catch((error) => {
+                handleError(error.response.status);
               });
           },
         },
@@ -94,7 +98,8 @@ function Post() {
             .then((editedPost) => {
               setSelectedPost(editedPost.data);
               setEditClicked(false);
-            });
+            })
+            .catch((err) => handleError(err.response.status));
         })
         .catch((err) => {
           if (err.response.status === 409) {
@@ -116,8 +121,10 @@ function Post() {
                           .then((editedPost) => {
                             setSelectedPost(editedPost.data);
                             setEditClicked(false);
-                          });
-                      });
+                          })
+                          .catch((err) => handleError(err.response.status));
+                      })
+                      .catch((err) => handleError(err.response.status));
                   },
                 },
                 {
@@ -126,6 +133,8 @@ function Post() {
                 },
               ],
             });
+          } else {
+            handleError(err.response.status);
           }
         });
     } else {
@@ -140,77 +149,85 @@ function Post() {
         setSelectedPost(res.data);
       })
       .catch((err) => {
-        setError(err.response.status);
+        handleError(err.response.status);
       });
-  }, [postTitle]);
+  }, [postTitle, handleError]);
 
   return (
-    <main>
+    <div className="container">
       {deleteClicked && <Redirect to="/" />}
-      {error && <Redirect to="/Error404" component={Error} />}
-      <div className="container">
-        <Header />
-        <h1>
+      {/* {error && <Redirect to="/Error404" component={Error} />} */}
+      <Header />
+
+      {editClicked ? (
+        <div className="form-group">
+          <label>Title</label>
           <input
             onChange={handleChange}
             value={selectedPost.title}
-            style={{ border: "none", resize: "none" }}
-            disabled={editClicked ? false : true}
             type="text"
             name="title"
+            className="form-control"
           ></input>
-        </h1>
-        <p>
+        </div>
+      ) : (
+        <h1>{selectedPost.title}</h1>
+      )}
+
+      {editClicked ? (
+        <div className="form-group">
+          <label>Content</label>
           <textarea
             onChange={handleChange}
-            style={{ border: "none", resize: "none" }}
-            disabled={editClicked ? false : true}
-            type="text"
+            className="form-control"
             value={selectedPost.content}
-            // value={editClicked ? editClicked.content : selectedPost.content}
             name="content"
+            rows="5"
+            columns="30"
           ></textarea>
-        </p>
+        </div>
+      ) : (
+        <p>{selectedPost.content} </p>
+      )}
 
-        {editClicked ? (
+      {editClicked ? (
+        <Button
+          onClick={handleClickUpdate}
+          variant="contained"
+          color="primary"
+          size="small"
+          className={IconLabelButtons.button}
+          endIcon={<Icon>send</Icon>}
+        >
+          Update
+        </Button>
+      ) : (
+        <span>
           <Button
-            onClick={handleClickUpdate}
+            onClick={handleClickDelete}
             variant="contained"
-            color="primary"
             size="small"
+            color="primary"
             className={IconLabelButtons.button}
-            endIcon={<Icon>send</Icon>}
+            startIcon={<DeleteIcon />}
           >
-            Update
+            Delete
           </Button>
-        ) : (
-          <span>
-            <Button
-              onClick={handleClickDelete}
-              variant="contained"
-              size="small"
-              color="primary"
-              className={IconLabelButtons.button}
-              startIcon={<DeleteIcon />}
-            >
-              Delete
-            </Button>
-            &nbsp;&nbsp;&nbsp;
-            <Button
-              onClick={handleClickEdit}
-              variant="contained"
-              size="small"
-              color="primary"
-              className={IconLabelButtons.button}
-              startIcon={<EditIcon />}
-            >
-              Edit
-            </Button>
-          </span>
-        )}
-        <Footer />
-      </div>
-    </main>
+          &nbsp;&nbsp;&nbsp;
+          <Button
+            onClick={handleClickEdit}
+            variant="contained"
+            size="small"
+            color="primary"
+            className={IconLabelButtons.button}
+            startIcon={<EditIcon />}
+          >
+            Edit
+          </Button>
+        </span>
+      )}
+      <Footer />
+    </div>
   );
 }
 

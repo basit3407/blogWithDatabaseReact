@@ -4,22 +4,28 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-function Home() {
+function Home(props) {
   const [posts, setPosts] = useState([]);
+  const { handleError } = props;
 
   const url = "http://localhost:5000/";
 
   useEffect(() => {
     let isMounted = true;
-    axios.get(url).then((res) => {
-      if (isMounted) {
-        setPosts(res.data);
-      }
-    });
+    axios
+      .get(url)
+      .then((res) => {
+        if (isMounted) {
+          setPosts(res.data);
+        }
+      })
+      .catch((error) => {
+        handleError(error.response.status);
+      });
     return () => {
       isMounted = false;
     };
-  }, [posts]);
+  }, [posts, handleError]);
 
   return (
     <div className="container">

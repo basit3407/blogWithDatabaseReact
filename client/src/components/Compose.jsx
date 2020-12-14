@@ -6,9 +6,10 @@ import { Redirect } from "react-router";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
-function Compose() {
+function Compose(props) {
   const [post, setPost] = useState({ title: "", content: "" });
   const [isSubmitted, setISSubmitted] = useState(false);
+  const { handleError } = props;
 
   function handleSubmit(event) {
     axios
@@ -30,7 +31,8 @@ function Compose() {
                     .post("http://localhost:5000/duplicatetitle", post)
                     .then(() => {
                       setISSubmitted(true);
-                    });
+                    })
+                    .catch((err) => handleError(err.response.status));
                 },
               },
               {
@@ -39,6 +41,8 @@ function Compose() {
               },
             ],
           });
+        } else {
+          handleError(err.response.status);
         }
       });
 
@@ -57,38 +61,36 @@ function Compose() {
   }
 
   return (
-    <main>
+    <div className="container">
       {isSubmitted && <Redirect to="/" />}
-      <div className="container">
-        <Header />
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Title</label>
+      <Header />
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Title</label>
 
-            <input
-              onChange={handleChange}
-              className="form-control"
-              name="title"
-              value={post.title}
-            ></input>
+          <input
+            onChange={handleChange}
+            className="form-control"
+            name="title"
+            value={post.title}
+          ></input>
 
-            <label>Post</label>
-            <textarea
-              onChange={handleChange}
-              className="form-control"
-              name="content"
-              rows="5"
-              cols="30"
-              value={post.content}
-            ></textarea>
-          </div>
-          <button className="btn btn-primary" type="submit" name="button">
-            Publish
-          </button>
-        </form>
-        <Footer />
-      </div>
-    </main>
+          <label>Content</label>
+          <textarea
+            onChange={handleChange}
+            className="form-control"
+            name="content"
+            rows="5"
+            cols="30"
+            value={post.content}
+          ></textarea>
+        </div>
+        <button className="btn btn-primary" type="submit" name="button">
+          Publish
+        </button>
+      </form>
+      <Footer />
+    </div>
   );
 }
 
