@@ -18,6 +18,7 @@ function Compose(props) {
         setISSubmitted(true);
       })
       .catch((err) => {
+        console.error(err.response);
         if (err.response.status === 409) {
           confirmAlert({
             title: "Confirm to Submit",
@@ -33,7 +34,7 @@ function Compose(props) {
                       setISSubmitted(true);
                     })
                     .catch((err) => {
-                      handleError(err);
+                      handleError(err.reponse.status);
                     });
                 },
               },
@@ -44,7 +45,7 @@ function Compose(props) {
             ],
           });
         } else {
-          handleError(err);
+          handleError(err.reponse.status);
         }
       });
 

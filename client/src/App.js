@@ -10,15 +10,16 @@ import Error404 from "./components/Error404";
 import { Redirect } from "react-router";
 
 function App() {
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
-  function handleErrors(error) {
-    error && setError(true);
+  function handleErrors(errorStatusCode) {
+    errorStatusCode === 404 ? setError(404) : setError(500);
   }
 
   return (
     <main>
-      {error && <Redirect to="/Error500" />}
+      {error === 404 && <Redirect to="/Error404" />}
+      {error === 500 && <Redirect to="/Error500" />}
       <Switch>
         <Route
           exact
@@ -34,6 +35,7 @@ function App() {
           render={(props) => <Post {...props} handleError={handleErrors} />}
         />
         <Route
+          exact
           path="/compose"
           render={(props) => <Compose {...props} handleError={handleErrors} />}
         />

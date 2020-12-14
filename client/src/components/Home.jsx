@@ -19,9 +19,7 @@ function Home(props) {
           setPosts(res.data);
         }
       })
-      .catch((error) => {
-        handleError(error);
-      });
+      .catch(() => handleError(500));
     return () => {
       isMounted = false;
     };

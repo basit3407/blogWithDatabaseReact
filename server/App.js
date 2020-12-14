@@ -10,16 +10,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/public", express.static("public"));
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.requestStatus = err.status || "error";
-
-  res.status(err.statusCode).json({
-    requestStatus: err.requestStatus,
-    message: err.message,
-  });
-});
 
 mongoose.connect(
   "mongodb+srv://basit3407:Kmha@3407@cluster0.rpbol.mongodb.net/blogdbDatabase?retryWrites=true&w=majority",
@@ -55,6 +45,7 @@ app.post("/", (req, res, next) => {
           title: newPost.title,
           content: newPost.content,
         });
+
         post.save((error) => (!error ? res.json("Post added") : next(error)));
       } else {
         res.status(409).json({
