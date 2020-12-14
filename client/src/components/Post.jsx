@@ -3,7 +3,6 @@ import Footer from "./Footer";
 import React, { useEffect, useState, useRef } from "react";
 import { Redirect, useParams } from "react-router";
 import axios from "axios";
-// import Error from "./Error";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -30,7 +29,7 @@ function Post(props) {
     _id: "",
     _v: "",
   });
-  // const [error, setError] = useState(null);
+
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
   const { postTitle } = useParams();
@@ -154,80 +153,81 @@ function Post(props) {
   }, [postTitle, handleError]);
 
   return (
-    <div className="container">
+    <main>
       {deleteClicked && <Redirect to="/" />}
-      {/* {error && <Redirect to="/Error404" component={Error} />} */}
+
       <Header />
+      <div className="container">
+        {editClicked ? (
+          <div className="form-group">
+            <label>Title</label>
+            <input
+              onChange={handleChange}
+              value={selectedPost.title}
+              type="text"
+              name="title"
+              className="form-control"
+            ></input>
+          </div>
+        ) : (
+          <h1>{selectedPost.title}</h1>
+        )}
 
-      {editClicked ? (
-        <div className="form-group">
-          <label>Title</label>
-          <input
-            onChange={handleChange}
-            value={selectedPost.title}
-            type="text"
-            name="title"
-            className="form-control"
-          ></input>
-        </div>
-      ) : (
-        <h1>{selectedPost.title}</h1>
-      )}
+        {editClicked ? (
+          <div className="form-group">
+            <label>Content</label>
+            <textarea
+              onChange={handleChange}
+              className="form-control"
+              value={selectedPost.content}
+              name="content"
+              rows="5"
+              columns="30"
+            ></textarea>
+          </div>
+        ) : (
+          <p>{selectedPost.content} </p>
+        )}
 
-      {editClicked ? (
-        <div className="form-group">
-          <label>Content</label>
-          <textarea
-            onChange={handleChange}
-            className="form-control"
-            value={selectedPost.content}
-            name="content"
-            rows="5"
-            columns="30"
-          ></textarea>
-        </div>
-      ) : (
-        <p>{selectedPost.content} </p>
-      )}
-
-      {editClicked ? (
-        <Button
-          onClick={handleClickUpdate}
-          variant="contained"
-          color="primary"
-          size="small"
-          className={IconLabelButtons.button}
-          endIcon={<Icon>send</Icon>}
-        >
-          Update
-        </Button>
-      ) : (
-        <span>
+        {editClicked ? (
           <Button
-            onClick={handleClickDelete}
+            onClick={handleClickUpdate}
             variant="contained"
-            size="small"
             color="primary"
-            className={IconLabelButtons.button}
-            startIcon={<DeleteIcon />}
-          >
-            Delete
-          </Button>
-          &nbsp;&nbsp;&nbsp;
-          <Button
-            onClick={handleClickEdit}
-            variant="contained"
             size="small"
-            color="primary"
             className={IconLabelButtons.button}
-            startIcon={<EditIcon />}
+            endIcon={<Icon>send</Icon>}
           >
-            Edit
+            Update
           </Button>
-        </span>
-      )}
+        ) : (
+          <span>
+            <Button
+              onClick={handleClickDelete}
+              variant="contained"
+              size="small"
+              color="primary"
+              className={IconLabelButtons.button}
+              startIcon={<DeleteIcon />}
+            >
+              Delete
+            </Button>
+            &nbsp;&nbsp;&nbsp;
+            <Button
+              onClick={handleClickEdit}
+              variant="contained"
+              size="small"
+              color="primary"
+              className={IconLabelButtons.button}
+              startIcon={<EditIcon />}
+            >
+              Edit
+            </Button>
+          </span>
+        )}
+      </div>
       <Footer />
-    </div>
+    </main>
   );
 }
 

@@ -61,36 +61,38 @@ function Compose(props) {
   }
 
   return (
-    <div className="container">
+    <main>
       {isSubmitted && <Redirect to="/" />}
       <Header />
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Title</label>
+      <div className="container">
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Title</label>
 
-          <input
-            onChange={handleChange}
-            className="form-control"
-            name="title"
-            value={post.title}
-          ></input>
+            <input
+              onChange={handleChange}
+              className="form-control"
+              name="title"
+              value={post.title}
+            ></input>
 
-          <label>Content</label>
-          <textarea
-            onChange={handleChange}
-            className="form-control"
-            name="content"
-            rows="5"
-            cols="30"
-            value={post.content}
-          ></textarea>
-        </div>
-        <button className="btn btn-primary" type="submit" name="button">
-          Publish
-        </button>
-      </form>
+            <label>Content</label>
+            <textarea
+              onChange={handleChange}
+              className="form-control"
+              name="content"
+              rows="5"
+              cols="30"
+              value={post.content}
+            ></textarea>
+          </div>
+          <button className="btn btn-primary" type="submit" name="button">
+            Publish
+          </button>
+        </form>
+      </div>
       <Footer />
-    </div>
+    </main>
   );
 }
 
