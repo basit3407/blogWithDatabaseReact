@@ -10,6 +10,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Icon from "@material-ui/core/Icon";
+import Error404 from "./Error404";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -32,6 +33,7 @@ function Post(props) {
 
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
+  const [error404, setError404] = useState(false);
   const { postTitle } = useParams();
   const { handleError } = props;
 
@@ -49,7 +51,7 @@ function Post(props) {
                 setDeleteClicked(true);
               })
               .catch((error) => {
-                handleError(error.response.status);
+                handleError(error);
               });
           },
         },
@@ -98,7 +100,7 @@ function Post(props) {
               setSelectedPost(editedPost.data);
               setEditClicked(false);
             })
-            .catch((err) => handleError(err.response.status));
+            .catch((err) => handleError(err));
         })
         .catch((err) => {
           if (err.response.status === 409) {
@@ -121,9 +123,9 @@ function Post(props) {
                             setSelectedPost(editedPost.data);
                             setEditClicked(false);
                           })
-                          .catch((err) => handleError(err.response.status));
+                          .catch((err) => handleError(err));
                       })
-                      .catch((err) => handleError(err.response.status));
+                      .catch((err) => handleError(err));
                   },
                 },
                 {
@@ -133,7 +135,7 @@ function Post(props) {
               ],
             });
           } else {
-            handleError(err.response.status);
+            handleError(err);
           }
         });
     } else {
@@ -147,14 +149,15 @@ function Post(props) {
       .then((res) => {
         setSelectedPost(res.data);
       })
-      .catch((err) => {
-        handleError(err.response.status);
-      });
+      .catch((err) =>
+        err.response.status === 404 ? setError404(true) : handleError(err)
+      );
   }, [postTitle, handleError]);
 
   return (
     <main>
       {deleteClicked && <Redirect to="/" />}
+      {error404 && <Redirect to="/Error404" component={Error404} />}
 
       <Header />
       <div className="container">

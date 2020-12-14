@@ -20,7 +20,7 @@ function Home(props) {
         }
       })
       .catch((error) => {
-        handleError(error.response.status);
+        handleError(error);
       });
     return () => {
       isMounted = false;

@@ -32,7 +32,9 @@ function Compose(props) {
                     .then(() => {
                       setISSubmitted(true);
                     })
-                    .catch((err) => handleError(err.response.status));
+                    .catch((err) => {
+                      handleError(err);
+                    });
                 },
               },
               {
@@ -42,7 +44,7 @@ function Compose(props) {
             ],
           });
         } else {
-          handleError(err.response.status);
+          handleError(err);
         }
       });
 
