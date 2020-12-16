@@ -49,7 +49,7 @@ function Home(props) {
               <h1>{post.title}</h1>
               <p>
                 {post.content.substring(0, 100) + " ..."}
-                <Link to={"/post/" + post.title}>Read more</Link>
+                <Link to={`/post/${post.title}`}>Read more</Link>
               </p>
             </div>
           );
