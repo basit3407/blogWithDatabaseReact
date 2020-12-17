@@ -10,7 +10,7 @@ router.get(
     // on Failure redirect to login page
     failureRedirect: `http://localhost3000/login`,
   }),
-  function (req, res) {
+  (req, res) => {
     // Successful authentication, redirect to home page
     res.redirect(`http://localhost3000/user/${req.user._id}/home`);
   }

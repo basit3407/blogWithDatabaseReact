@@ -44,6 +44,8 @@ app.use("/login", login);
 app.use("/user", user);
 app.use("/register", register);
 
+// eslint-disable-next-line no-unused-vars
+
 mongoose.connect(
   "mongodb+srv://basit3407:Kmha@3407@cluster0.rpbol.mongodb.net/blogdbDatabase?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
@@ -65,16 +67,18 @@ const userSchema = {
   },
   username: {
     type: String,
+    // eslint-disable-next-line no-useless-escape
+    match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Invalid email format"],
     required: [true, "Please enter your email."],
     unique: true,
   },
   password: {
     type: String,
     required: [true, "Please enter your password."],
-    unique: true,
   },
   googleId: String,
   facebookId: String,
+  secret: String,
   posts: [postSchema],
 };
 
