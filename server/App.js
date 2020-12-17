@@ -57,15 +57,11 @@ const postSchema = {
 };
 
 const userSchema = {
-  fname: {
-    type: String,
-    required: [true, "Please enter your first name."],
-  },
-  lname: {
+  name: {
     type: String,
     required: [true, "Please enter your last name."],
   },
-  username: {
+  email: {
     type: String,
     // eslint-disable-next-line no-useless-escape
     match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Invalid email format"],

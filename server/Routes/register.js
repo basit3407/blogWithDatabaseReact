@@ -5,13 +5,13 @@ const router = express.Router();
 import User from "../App";
 
 //Add new User
-router.post("/add", (req, res, next) => {
-  const { fname, lname, username, password } = req.body;
+router.post("/", (req, res, next) => {
+  const { name, email, password } = req.body;
 
   const newUser = new User({
-    fname: fname,
-    lname: lname,
-    username: username,
+    name: name,
+
+    email: email,
     password: password,
   });
 
@@ -21,15 +21,14 @@ router.post("/add", (req, res, next) => {
     } else {
       // check for validation errors
       if (err.name === "ValidationError") {
-        const { fname, lname, username, password } = err.errors;
+        const { name, email, password } = err.errors;
 
-        if (fname) error(fname.message);
-        if (lname) error(lname.message);
-        if (username) error(username.message);
+        if (name) error(name.message);
+        if (email) error(email.message);
         if (password) error(password.message);
-        // check if username exists
+        // check if email exists
       } else if (err.name === `MongoError` && error.code === 11000) {
-        res.status(11000).json({ error: "This username already exist." });
+        res.status(11000).json({ error: "This email already exist." });
       } else {
         next(err);
       }

@@ -5,11 +5,11 @@ const router = express.Router();
 import User, { passport } from "../App";
 
 router.post("/", (req, res, next) => {
-  const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
 
   const user = new User({
-    username: username,
+    email: email,
     password: password,
   });
 
