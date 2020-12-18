@@ -32,8 +32,9 @@ function Post(props) {
 
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
-  const { postTitle } = useParams();
+  const { _id, postId } = useParams();
   const { handleError } = props;
+  const url = `http://localhost5000/user/${_id}/posts/${postId}`;
 
   function handleClickDelete() {
     confirmAlert({
@@ -44,7 +45,7 @@ function Post(props) {
           label: "Yes",
           onClick: () => {
             axios
-              .delete(`http://localhost:5000/post/${selectedPost._id}`)
+              .delete(url)
               .then(() => {
                 setDeleteClicked(true);
               })
@@ -87,68 +88,61 @@ function Post(props) {
   const previousValue = usePrevious(selectedPost);
 
   function handleClickUpdate() {
-    // if title same no action
-    if (previousValue !== selectedPost) {
-      axios
-        .put(`http://localhost:5000/`, selectedPost)
-        .then(() => {
-          axios
-            .get(`http://localhost:5000/updatepost/${selectedPost._id}`)
-            .then((editedPost) => {
-              setSelectedPost(editedPost.data);
-              setEditClicked(false);
-            })
-            .catch((err) => handleError(err.reponse.status));
-        })
-        .catch((err) => {
-          if (err.response.status === 409) {
-            confirmAlert({
-              title: "Confirm to Submit",
-              message:
-                "This title alredy exisits, Do you still want to submit it??",
-              buttons: [
-                {
-                  label: "Yes",
-                  onClick: () => {
-                    axios
-                      .put("http://localhost:5000/duplicatetitle", selectedPost)
-                      .then(() => {
+    previousValue !== selectedPost
+      ? axios
+          .put(`${url}/update`, selectedPost)
+          .then(() => {
+            axios
+              .get(`${url}/updated`)
+              .then((editedPost) => {
+                setSelectedPost(editedPost.data);
+                setEditClicked(false);
+              })
+              .catch((err) => handleError(err.reponse.status));
+          })
+          .catch((err) => {
+            err.response.status === 409
+              ? confirmAlert({
+                  title: "Confirm to Submit",
+                  message:
+                    "This title alredy exisits, Do you still want to submit it??",
+                  buttons: [
+                    {
+                      label: "Yes",
+                      onClick: () => {
                         axios
-                          .get(
-                            `http://localhost:5000/updatepost/${selectedPost._id}`
-                          )
-                          .then((editedPost) => {
-                            setSelectedPost(editedPost.data);
-                            setEditClicked(false);
+                          .put(`${url}/update/duplicate`, selectedPost)
+                          .then(() => {
+                            axios
+                              .get(`${url}/updated`)
+                              .then((editedPost) => {
+                                setSelectedPost(editedPost.data);
+                                setEditClicked(false);
+                              })
+                              .catch((err) => handleError(err.reponse.status));
                           })
                           .catch((err) => handleError(err.reponse.status));
-                      })
-                      .catch((err) => handleError(err.reponse.status));
-                  },
-                },
-                {
-                  label: "No",
-                  onClick: () => setEditClicked(true),
-                },
-              ],
-            });
-          } else {
-            handleError(err.reponse.status);
-          }
-        });
-    } else {
-      setEditClicked(false);
-    }
+                      },
+                    },
+                    {
+                      label: "No",
+                      onClick: () => setEditClicked(true),
+                    },
+                  ],
+                })
+              : handleError(err.reponse.status);
+          })
+      : setEditClicked(false);
   }
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/post/${postTitle}`)
+      .get(`${url}`)
       .then((res) => {
         setSelectedPost(res.data);
       })
       .catch((err) => handleError(err.response.status));
-  }, [postTitle, handleError]);
+  }, [url, handleError]);
 
   return (
     <main>

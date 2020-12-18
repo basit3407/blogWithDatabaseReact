@@ -1,14 +1,15 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 
 function Home(props) {
   const [posts, setPosts] = useState([]);
+  const { _id } = useParams();
   const { handleError } = props;
 
-  const url = "http://localhost:5000/";
+  const url = `http://localhost:5000/user/${_id}/home`;
 
   useEffect(() => {
     let isMounted = true;
@@ -23,7 +24,7 @@ function Home(props) {
     return () => {
       isMounted = false;
     };
-  }, [posts, handleError]);
+  }, [posts, handleError, url]);
 
   return (
     <main>

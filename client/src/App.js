@@ -8,6 +8,9 @@ import Compose from "./components/Compose";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 import { Redirect } from "react-router";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import ForgotEmail from "./components/ForgotPassword";
 
 function App() {
   const [error, setError] = useState(null);
@@ -24,6 +27,17 @@ function App() {
         <Route
           exact
           path="/"
+          render={(props) => <Login {...props} handleError={handleErrors} />}
+        />
+        <Route
+          exact
+          path="/register"
+          render={(props) => <Register {...props} handleError={handleErrors} />}
+        />
+        <Route exact path="/forgot" component={ForgotEmail} />
+        <Route
+          exact
+          path="/user/:_id/home"
           render={(props) => <Home {...props} handleError={handleErrors} />}
         />
         <Route exact path="/about" component={About} />
@@ -31,12 +45,12 @@ function App() {
         <Route
           exact
           npm
-          path="/post/:postTitle"
+          path="/user/:_id/posts/:postId"
           render={(props) => <Post {...props} handleError={handleErrors} />}
         />
         <Route
           exact
-          path="/compose"
+          path="/user/:_id/add"
           render={(props) => <Compose {...props} handleError={handleErrors} />}
         />
         <Route exact path="/Error500" component={Error500} />

@@ -2,51 +2,53 @@ import Header from "./Header";
 import Footer from "./Footer";
 import React, { useState } from "react";
 import axios from "axios";
-import { Redirect } from "react-router";
+import { Redirect, useParams } from "react-router";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 function Compose(props) {
   const [post, setPost] = useState({ title: "", content: "" });
   const [isSubmitted, setISSubmitted] = useState(false);
+  const { _id } = useParams();
   const { handleError } = props;
+
+  const url = `http://localhost:5000/user/${_id}/add`;
 
   function handleSubmit(event) {
     axios
-      .post("http://localhost:5000/", post)
+      .post(`${url}/new`, post)
       .then(() => {
         setISSubmitted(true);
       })
       .catch((err) => {
         console.error(err.response);
-        if (err.response.status === 409) {
-          confirmAlert({
-            title: "Confirm to Submit",
-            message:
-              "This title alredy exisits, Do you still want to submit it??",
-            buttons: [
-              {
-                label: "Yes",
-                onClick: () => {
-                  axios
-                    .post("http://localhost:5000/duplicatetitle", post)
-                    .then(() => {
-                      setISSubmitted(true);
-                    })
-                    .catch((err) => {
-                      handleError(err.reponse.status);
-                    });
+
+        err.response.status === 409
+          ? confirmAlert({
+              title: "Confirm to Submit",
+              message:
+                "This title alredy exisits, Do you still want to submit it??",
+              buttons: [
+                {
+                  label: "Yes",
+                  onClick: () => {
+                    axios
+                      .post(`${url}/duplicate`, post)
+                      .then(() => {
+                        setISSubmitted(true);
+                      })
+                      .catch((err) => {
+                        handleError(err.reponse.status);
+                      });
+                  },
                 },
-              },
-              {
-                label: "No",
-                onClick: () => setISSubmitted(false),
-              },
-            ],
-          });
-        } else {
-          handleError(err.reponse.status);
-        }
+                {
+                  label: "No",
+                  onClick: () => setISSubmitted(false),
+                },
+              ],
+            })
+          : handleError(err.reponse.status);
       });
 
     event.preventDefault();

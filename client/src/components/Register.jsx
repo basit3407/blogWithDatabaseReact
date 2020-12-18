@@ -8,7 +8,7 @@ function Register(props) {
     _v: "",
     name: "",
     email: "",
-    passowrd: "",
+    password: "",
   });
   const [isRegistered, setIsRegistered] = useState(false);
   const [error, setError] = useState("");
@@ -32,11 +32,9 @@ function Register(props) {
           event.preventDefault();
         })
         .catch((e) => {
-          if (e.response.status === 400) {
-            setError(e.message);
-          } else {
-            props.handleError(e.response.status);
-          }
+          e.response.status === 400 || e.response.status === 11000
+            ? setError(e.message)
+            : props.handleError(e.response.status);
         });
     } else {
       setError("confirm password and password are not same");
@@ -46,7 +44,7 @@ function Register(props) {
   return (
     <main className="register-main">
       <div className="container">
-        {isRegistered && <Redirect to="/login" />}
+        {isRegistered && <Redirect to="/" />}
         <div className="row main">
           <div className="panel-heading">
             <div className="panel-title text-center">
@@ -121,7 +119,7 @@ function Register(props) {
                       className="form-control register-input"
                       name="password"
                       id="password"
-                      value={userDetails.passowrd}
+                      value={userDetails.password}
                       onChange={handleChange}
                       placeholder="Enter your Password"
                     />
@@ -159,7 +157,7 @@ function Register(props) {
                 </button>
               </div>
               <div className="login-register">
-                <Link to=".login">Login</Link>
+                <Link to="/">Login</Link>
               </div>
             </form>
           </div>

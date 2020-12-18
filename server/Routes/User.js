@@ -8,7 +8,9 @@ router.get("/:_id/home", (req, res, next) => {
   if (req.isAuthenticated) {
     const userId = req.params._id;
 
-    User.findById(userId, (err, user) => (!err ? res.json(user) : next(err)));
+    User.findById(userId, (err, user) =>
+      !err ? res.json(user.posts) : next(err)
+    );
   } else {
     try {
       res.redirect("http://localhost3000/login");
@@ -102,7 +104,7 @@ router.post("/:_id/add/new", (req, res, next) => {
 });
 
 // Adding Post with duplicate title
-router.post("/:_id/home/add/uplicate", (req, res, next) => {
+router.post("/:_id/home/add/duplicate", (req, res, next) => {
   if (req.isAuthenticated) {
     const duplicatePost = req.body;
     const userId = req.params._id;
@@ -130,7 +132,7 @@ router.post("/:_id/home/add/uplicate", (req, res, next) => {
 });
 
 // Updating Post
-router.put("/:_id/home/posts/update", (req, res, next) => {
+router.put("/:_id/posts/:postId/update", (req, res, next) => {
   if (req.isAuthenticated) {
     const userId = req.params._id;
     const updatedPost = req.body;
@@ -180,7 +182,7 @@ router.put("/:_id/home/posts/update", (req, res, next) => {
 });
 
 // Updating post with duplicate title
-router.put("/:_id/home/posts/update/duplicate", (req, res, next) => {
+router.put("/:_id/posts/:postId/update/duplicate", (req, res, next) => {
   if (req.isAuthenticated) {
     const userId = req.params._id;
     const updatedPost = req.body;
