@@ -1,29 +1,25 @@
-import express from "express";
+const express = require("express");
 const router = express.Router();
+const passport = require("passport");
 
 // importing databaseCollections from App.js
-import User, { passport } from "../App";
+const User = require("../userModel");
 
 router.post("/", (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { username, password } = req.body;
 
   const user = new User({
-    email: email,
+    username: username,
     password: password,
   });
 
   req.login(user, (err) => {
-    err
-      ? next(err)
-      : passport.authenticate("local")(req, res, next, () => {
+    !err
+      ? passport.authenticate("local")(req, res, () => {
           // on Success redirect to homepage of the loggged in user
-          try {
-            res.redirect(`http://localhost3000/user/${req.user._id}/home`);
-          } catch (e) {
-            next(e);
-          }
-        });
+          res.redirect(`http://localhost3000/user/${req.user._id}/home`);
+        })
+      : next(err);
   });
 });
 

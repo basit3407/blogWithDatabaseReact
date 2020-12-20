@@ -29,16 +29,16 @@ function Register(props) {
       Axios.post(`http://localhost5000/register/`, userDetails)
         .then(() => {
           setIsRegistered(true);
-          event.preventDefault();
         })
         .catch((e) => {
-          e.response.status === 400 || e.response.status === 11000
-            ? setError(e.message)
-            : props.handleError(e.response.status);
+          // e.response.status === 400 || e.response.status === 11000
+          //   ? setError(e.message)
+          //   : props.handleError(e.response.status);
         });
     } else {
       setError("confirm password and password are not same");
     }
+    event.preventDefault();
   }
 
   return (
@@ -56,7 +56,7 @@ function Register(props) {
             <form className="form-horizontal" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label
-                  for="name"
+                  htmlFor="name"
                   className="cols-sm-2 control-label register-label"
                 >
                   Your Name
@@ -80,7 +80,7 @@ function Register(props) {
 
               <div className="form-group register">
                 <label
-                  for="email"
+                  htmlFor="email"
                   className="cols-sm-2 control-label register-label"
                 >
                   Your Email
@@ -104,7 +104,7 @@ function Register(props) {
 
               <div className="form-group register">
                 <label
-                  for="password"
+                  htmlFor="password"
                   className="cols-sm-2 control-label register-label"
                 >
                   Password
@@ -128,7 +128,7 @@ function Register(props) {
               </div>
 
               <div className="form-group register">
-                <label for="confirm" className="cols-sm-2 control-label">
+                <label htmlFor="confirm" className="cols-sm-2 control-label">
                   Confirm Password
                 </label>
                 <div className="cols-sm-10">

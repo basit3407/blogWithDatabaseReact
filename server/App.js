@@ -1,21 +1,18 @@
 require("dotenv").config();
-import express from "express";
-import session from "express-session";
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import passport from "passport";
-import passportLocalMongoose from "passport-local-mongoose";
-import findOrCreate from "mongoose-findorcreate";
-import cors from "cors";
-import helmet from "hemlet";
-import facebookLogin from "./Routes/facebookLogin";
-import googleLogin from "./Routes/googleLogin";
-import login from "./Routes/login";
-import user from "./Routes/User";
-import register from "./Routes/register";
+const express = require("express");
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const passport = require("passport");
+const cors = require("cors");
+const helmet = require("helmet");
 
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
+const facebookLogin = require("./Routes/facebookLogin");
+const googleLogin = require("./Routes/googleLogin");
+const login = require("./Routes/login");
+const user = require("./Routes/User");
+const register = require("./Routes/register");
+const logout = require("./Routes/logout");
 
 const port = 5000;
 
@@ -25,11 +22,10 @@ app.use(cors());
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use("/public", express.static("public"));
 
 app.use(
   session({
-    secret: process.env.SESSION_KEY,
+    secret: "my little secret",
     resave: false,
     saveUninitialized: false,
   })
@@ -38,95 +34,39 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+require("./passport")();
+
 app.use("/auth/facebook", facebookLogin);
 app.use("/auth/google", googleLogin);
 app.use("/login", login);
 app.use("/user", user);
 app.use("/register", register);
+app.use("/logout", logout);
+app.use((err, req, res, next) => {
+  if (err.name === "ValidationError") {
+    const { name, username } = err.errors;
 
-// eslint-disable-next-line no-unused-vars
+    if (name) error(name.message);
+    if (username) error(username.message);
+  } else
+    err.name === "UserExistsError"
+      ? res.status(409).json({ error: err.message })
+      : next(err);
+
+  function error(message) {
+    res.status(400).json({ error: message });
+  }
+});
 
 mongoose.connect(
   "mongodb+srv://basit3407:Kmha@3407@cluster0.rpbol.mongodb.net/blogdbDatabase?retryWrites=true&w=majority",
-  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  }
 );
-
-const postSchema = {
-  title: String,
-  content: String,
-};
-
-const userSchema = {
-  name: {
-    type: String,
-    required: [true, "Please enter your last name."],
-  },
-  email: {
-    type: String,
-    // eslint-disable-next-line no-useless-escape
-    match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Invalid email format"],
-    required: [true, "Please enter your email."],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Please enter your password."],
-  },
-  googleId: String,
-  facebookId: String,
-  secret: String,
-  posts: [postSchema],
-};
-
-userSchema.plugin(passportLocalMongoose);
-userSchema.plugin(findOrCreate);
-
-passport.use(User.createStrategy());
-
-passport.serializeUser((user, done) => done(null, user.id));
-
-passport.deserializeUser((id, done) => {
-  User.findById(id, (err, user) => {
-    done(err, user);
-  });
-});
-
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/auth/google/DailyJournal",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      User.findOrCreate({ googleId: profile.id }, function (err, user) {
-        return cb(err, user);
-      });
-    }
-  )
-);
-
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FACEBOOK_ID,
-      clientSecret: process.env.FACEBOOK_SECRET,
-      callbackURL: "http://localhost:5000/auth/facebook/DailyJournal",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      User.findOrCreate(
-        {
-          facebookId: profile.id,
-        },
-        function (err, user) {
-          return cb(err, user);
-        }
-      );
-    }
-  )
-);
-
-const User = mongoose.model("User", userSchema);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -137,6 +77,3 @@ db.once("open", function () {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
-
-export default User;
-export { app, passport };

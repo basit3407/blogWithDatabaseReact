@@ -1,12 +1,12 @@
-import express from "express";
+const express = require("express");
 const router = express.Router();
 
-import User from "../App";
+const User = require("../userModel");
 
 //Home page for user with all the posts;
-router.get("/:_id/home", (req, res, next) => {
+router.get("/:userId/home", (req, res, next) => {
   if (req.isAuthenticated) {
-    const userId = req.params._id;
+    const { userId } = req.params;
 
     User.findById(userId, (err, user) =>
       !err ? res.json(user.posts) : next(err)
@@ -21,11 +21,9 @@ router.get("/:_id/home", (req, res, next) => {
 });
 
 //Dedicated page for each post
-router.get("/:_id/posts/:postId", (req, res, next) => {
+router.get("/userId/posts/:postId", (req, res, next) => {
+  const { userId, postId } = req.params;
   if (req.isAuthenticated) {
-    const userId = req.params._id;
-    const postId = req.params.postId;
-
     User.findById(userId, (err, user) => {
       if (!err) {
         const selectedPost = user.posts.id(postId);
@@ -47,10 +45,9 @@ router.get("/:_id/posts/:postId", (req, res, next) => {
 });
 
 // Sending updated Post
-router.get("/:_id/posts/:postId/updated", (req, res, next) => {
+router.get("/:userId/posts/:postId/updated", (req, res, next) => {
   if (req.isAuthenticated) {
-    const userId = req.params._id;
-    const postId = req.params.postId;
+    const { userId, postId } = req.params;
 
     User.findById(userId, (err, user) => {
       if (!err) {
@@ -71,19 +68,20 @@ router.get("/:_id/posts/:postId/updated", (req, res, next) => {
 });
 
 //Adding New post
-router.post("/:_id/add/new", (req, res, next) => {
+router.post("/:userId/add/new", (req, res, next) => {
+  const { userId } = req.params;
   if (req.isAuthenticated) {
     User.findById(userId, (err, user) => {
       if (!err) {
         //   check if post title exsists or not.
         const existingPosts = user.posts.find(
-          (existingPost) => existingPost.title === newPost.title
+          (existingPost) => existingPost.title === req.body.title
         );
 
         if (existingPosts) {
           res.status(409).json({ error: "This post title already existis" });
         } else {
-          user.posts.push({ title: newPost.title, content: newPost.content });
+          user.posts.push({ title: req.body.title, content: req.body.content });
           user.save((error) =>
             err ? next(error) : res.json("Post added sucessfully")
           );
@@ -99,15 +97,13 @@ router.post("/:_id/add/new", (req, res, next) => {
       next(e);
     }
   }
-  const newPost = req.body;
-  const userId = req.params._id;
 });
 
 // Adding Post with duplicate title
-router.post("/:_id/home/add/duplicate", (req, res, next) => {
+router.post("/:userId/add/duplicate", (req, res, next) => {
   if (req.isAuthenticated) {
     const duplicatePost = req.body;
-    const userId = req.params._id;
+    const { userId } = req.params;
 
     User.findById(userId, (err, user) => {
       if (!err) {
@@ -132,37 +128,39 @@ router.post("/:_id/home/add/duplicate", (req, res, next) => {
 });
 
 // Updating Post
-router.put("/:_id/posts/:postId/update", (req, res, next) => {
+router.put("/:userId/posts/:postId/update", (req, res, next) => {
   if (req.isAuthenticated) {
-    const userId = req.params._id;
-    const updatedPost = req.body;
+    const { userId, postId } = req.params;
 
     User.findById(userId, (err, user) => {
       if (!err) {
         //  check if title exists previously
+
         const existingPosts = user.posts.filter(
-          (existingPost) => existingPost.title === updatedPost.title
+          (existingPost) => existingPost.title === req.body.title
         );
+
         //  exclude the title of the selected post
         if (existingPosts.length) {
           const check = existingPosts.filter(
-            (existingPost) => !existingPost._id.equals(updatedPost._id)
+            (existingPost) => !existingPost._id.equals(postId)
           );
+
           if (check.length) {
             res.status(409).json({ error: "This title already exists" });
           } else {
-            const previousPost = user.posts.id(updatedPost._id);
-            previousPost.title = updatedPost.title;
-            previousPost.content = updatedPost.content;
+            const previousPost = user.posts.id(postId);
+            previousPost.title = req.body.title;
+            previousPost.content = req.body.content;
 
             user.save((error) =>
               error ? next(error) : res.json("post updated successfully")
             );
           }
         } else {
-          const previousPost = user.posts.id(updatedPost._id);
-          previousPost.title = updatedPost.title;
-          previousPost.content = updatedPost.content;
+          const previousPost = user.posts.id(postId);
+          previousPost.title = req.body.title;
+          previousPost.content = req.body.content;
 
           user.save((error) =>
             error ? next(error) : res.json("post updated successfully")
@@ -182,14 +180,14 @@ router.put("/:_id/posts/:postId/update", (req, res, next) => {
 });
 
 // Updating post with duplicate title
-router.put("/:_id/posts/:postId/update/duplicate", (req, res, next) => {
+router.put("/:userId/posts/:postId/update/duplicate", (req, res, next) => {
   if (req.isAuthenticated) {
-    const userId = req.params._id;
+    const { userId, postId } = req.params;
     const updatedPost = req.body;
 
     User.findById(userId, (err, user) => {
       if (!err) {
-        const previousPost = user.posts.id(updatedPost._id);
+        const previousPost = user.posts.id(postId);
 
         previousPost.title = updatedPost.title;
         previousPost.content = updatedPost.content;
@@ -209,11 +207,11 @@ router.put("/:_id/posts/:postId/update/duplicate", (req, res, next) => {
 });
 
 // Deleting post
-router.delete("/:_id/posts/:postId", (req, res, next) => {
+router.delete("/:userId/posts/:postId", (req, res, next) => {
   if (req.isAuthenticated) {
-    const { _id, postId } = req.params;
+    const { userId, postId } = req.params;
 
-    User.findById(_id, (err, user) => {
+    User.findById(userId, (err, user) => {
       if (!err) {
         const deletedPost = user.posts.id(postId);
         deletedPost.remove();

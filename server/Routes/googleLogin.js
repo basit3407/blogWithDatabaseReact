@@ -1,5 +1,5 @@
-import express from "express";
-import { passport } from "../App";
+const express = require("express");
+const passport = require("passport");
 const router = express.Router();
 
 router.get(
