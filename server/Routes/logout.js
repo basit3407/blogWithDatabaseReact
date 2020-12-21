@@ -3,7 +3,8 @@ const router = express.Router();
 
 router.get("/", function (req, res) {
   req.logout();
-  res.redirect("../login");
+  res.json("logged out");
+  // res.redirect("../login");
 });
 
 module.exports = router;

@@ -50,13 +50,14 @@ app.use((err, req, res, next) => {
 
     if (name) error(name.message);
     else if (username) error(username.message);
-  } else {
+  } else
     err.name === "UserExistsError" ||
     err.name === "MissingUsernameError" ||
     err.name === "MissingPasswordError"
       ? error(err.message)
-      : res.status(500).json({ error: "internal server error" });
-  }
+      : err.name === "CastError"
+      ? res.status(404)
+      : next(err);
 
   function error(message) {
     res.status(400).json({ error: message });

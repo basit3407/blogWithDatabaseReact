@@ -1,14 +1,15 @@
 import Axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 function Login(props) {
   const [enteredDetails, setEnteredDetails] = useState({
-    _id: "",
-    _v: "",
-    email: "",
+    username: "",
     password: "",
   });
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userId, setUserId] = useState("");
+  const { error, handleError } = props;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -19,13 +20,20 @@ function Login(props) {
   }
 
   function handleSubmit(event) {
-    Axios.post(`http://localhost5000/login`, enteredDetails)
-      .then(() => event.preventDefault())
-      .catch((e) => props.handleError(e.response.status));
+    Axios.post(`/login`, enteredDetails)
+      .then((response) => {
+        setUserId(response.data);
+        setLoggedIn(true);
+      })
+      .catch((e) => {
+        handleError(e.response.status, e.response.data);
+      });
+    event.preventDefault();
   }
 
   return (
     <div className="container">
+      {loggedIn && <Redirect to={`/user/${userId}/home`} />}
       <div className="row">
         <aside className="col-sm-4">
           <div className="card">
@@ -42,21 +50,21 @@ function Login(props) {
                   href="/auth/google"
                   className="btn btn-block btn-outline-info"
                 >
-                  <i className="fab fa-google"></i>   Login via google
+                  <i className="fab fa-google"></i> Login via google
                 </a>
                 <a
                   href="/auth/facebook"
                   className="btn btn-block btn-outline-primary"
                 >
-                  <i className="fab fa-facebook-f"></i>   Login via facebook
+                  <i className="fab fa-facebook-f"></i> Login via facebook
                 </a>
               </p>
               <hr></hr>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <input
-                    name="email"
-                    value={enteredDetails.email}
+                    name="username"
+                    value={enteredDetails.username}
                     onChange={handleChange}
                     className="form-control"
                     placeholder="Email"
@@ -88,6 +96,7 @@ function Login(props) {
                     <Link className="small" to="/forgot">
                       Forgot password?
                     </Link>
+                    {error && <span style={{ color: "red" }}>{error}</span>}
                   </div>
                 </div>
               </form>

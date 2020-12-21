@@ -9,7 +9,7 @@ function Register(props) {
     password: "",
   });
   const [isRegistered, setIsRegistered] = useState(false);
-  const [error, setError] = useState("");
+  const { handleError, error } = props;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -27,10 +27,8 @@ function Register(props) {
             console.log(res.data);
             setIsRegistered(true);
           })
-          .catch((e) => {
-            setError(e.response.data.error);
-          })
-      : setError("confirm password and password are not same");
+          .catch((e) => handleError(e.response.status, e.response.data.error))
+      : handleError(400, "Password and confirm password donot match");
 
     event.preventDefault();
   }

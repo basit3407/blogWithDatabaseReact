@@ -15,8 +15,9 @@ import ForgotEmail from "./components/ForgotPassword";
 function App() {
   const [error, setError] = useState(null);
 
-  function handleErrors(errorStatusCode) {
-    errorStatusCode === 404 ? setError(404) : setError(500);
+  function handleErrors(statusCode, message) {
+    if (statusCode === 404 || statusCode === 500) setError(statusCode);
+    else setError(message);
   }
 
   return (
@@ -27,12 +28,16 @@ function App() {
         <Route
           exact
           path="/"
-          render={(props) => <Login {...props} handleError={handleErrors} />}
+          render={(props) => (
+            <Login {...props} handleError={handleErrors} error={error} />
+          )}
         />
         <Route
           exact
           path="/register"
-          render={(props) => <Register {...props} handleError={handleErrors} />}
+          render={(props) => (
+            <Register {...props} handleError={handleErrors} error={error} />
+          )}
         />
         <Route exact path="/forgot" component={ForgotEmail} />
         <Route

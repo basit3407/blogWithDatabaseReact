@@ -19,11 +19,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "please enter password"],
   },
   googleId: String,
   facebookId: String,
-  secret: String,
   posts: [postSchema],
 });
 

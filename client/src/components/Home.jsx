@@ -20,7 +20,7 @@ function Home(props) {
           setPosts(res.data);
         }
       })
-      .catch(() => handleError(500));
+      .catch((e) => console.log(e.response));
     return () => {
       isMounted = false;
     };

@@ -5,19 +5,11 @@ const User = require("../userModel");
 
 //Home page for user with all the posts;
 router.get("/:userId/home", (req, res, next) => {
-  if (req.isAuthenticated) {
-    const { userId } = req.params;
+  const { userId } = req.params;
 
-    User.findById(userId, (err, user) =>
-      !err ? res.json(user.posts) : next(err)
-    );
-  } else {
-    try {
-      res.redirect("http://localhost3000/login");
-    } catch (e) {
-      next(e);
-    }
-  }
+  User.findById(userId, (err, user) => {
+    !err ? res.json(user.posts) : console.log(err);
+  });
 });
 
 //Dedicated page for each post
