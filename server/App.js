@@ -42,16 +42,21 @@ app.use("/login", login);
 app.use("/user", user);
 app.use("/register", register);
 app.use("/logout", logout);
+
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
     const { name, username } = err.errors;
 
     if (name) error(name.message);
-    if (username) error(username.message);
-  } else
-    err.name === "UserExistsError"
-      ? res.status(409).json({ error: err.message })
-      : next(err);
+    else if (username) error(username.message);
+  } else {
+    err.name === "UserExistsError" ||
+    err.name === "MissingUsernameError" ||
+    err.name === "MissingPasswordError"
+      ? error(err.message)
+      : res.status(500).json({ error: "internal server error" });
+  }
 
   function error(message) {
     res.status(400).json({ error: message });

@@ -1,4 +1,4 @@
-{ 
+{ "proxy": "http://localhost:5000",
   "name": "blogWithDatabaseReact",
   "version": "1.0.0",
   "description": "",

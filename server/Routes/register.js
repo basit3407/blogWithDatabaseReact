@@ -12,7 +12,7 @@ router.post("/", (req, res, next) => {
       !err
         ? passport.authenticate("local")(req, res, () => {
             // Redirect or do whatever you want after authentication
-            res.redirect(`http://localhost3000/user/${req.user._id}/home`);
+            res.json("user added");
           })
         : next(err);
     }

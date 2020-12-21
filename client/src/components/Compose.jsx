@@ -9,10 +9,11 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 function Compose(props) {
   const [post, setPost] = useState({ title: "", content: "" });
   const [isSubmitted, setISSubmitted] = useState(false);
+
   const { _id } = useParams();
   const { handleError } = props;
 
-  const url = `http://localhost:5000/user/${_id}/add`;
+  const url = `/user/${_id}/add`;
 
   function handleSubmit(event) {
     axios

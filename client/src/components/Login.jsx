@@ -38,18 +38,18 @@ function Login(props) {
               </Link>
               <h4 className="card-title mb-4 mt-1">Sign in</h4>
               <p>
-                <Link
-                  to="http://localhost5000/auth/google"
+                <a
+                  href="/auth/google"
                   className="btn btn-block btn-outline-info"
                 >
                   <i className="fab fa-google"></i>   Login via google
-                </Link>
-                <Link
-                  to="http://localhost5000/auth/facebook"
+                </a>
+                <a
+                  href="/auth/facebook"
                   className="btn btn-block btn-outline-primary"
                 >
                   <i className="fab fa-facebook-f"></i>   Login via facebook
-                </Link>
+                </a>
               </p>
               <hr></hr>
               <form onSubmit={handleSubmit}>

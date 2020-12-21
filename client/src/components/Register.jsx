@@ -4,10 +4,8 @@ import { Redirect, Link } from "react-router-dom";
 
 function Register(props) {
   const [userDetails, setUserDetails] = useState({
-    _id: "",
-    _v: "",
     name: "",
-    email: "",
+    username: "",
     password: "",
   });
   const [isRegistered, setIsRegistered] = useState(false);
@@ -22,28 +20,25 @@ function Register(props) {
   }
 
   function handleSubmit(event) {
-    if (
-      document.getElementById("password").value ===
-      document.getElementById("confirm").value
-    ) {
-      Axios.post(`http://localhost5000/register/`, userDetails)
-        .then(() => {
-          setIsRegistered(true);
-        })
-        .catch((e) => {
-          // e.response.status === 400 || e.response.status === 11000
-          //   ? setError(e.message)
-          //   : props.handleError(e.response.status);
-        });
-    } else {
-      setError("confirm password and password are not same");
-    }
+    document.getElementById("password").value ===
+    document.getElementById("confirm").value
+      ? Axios.post(`/register`, userDetails)
+          .then((res) => {
+            console.log(res.data);
+            setIsRegistered(true);
+          })
+          .catch((e) => {
+            setError(e.response.data.error);
+          })
+      : setError("confirm password and password are not same");
+
     event.preventDefault();
   }
 
   return (
     <main className="register-main">
       <div className="container">
+        .data
         {isRegistered && <Redirect to="/" />}
         <div className="row main">
           <div className="panel-heading">
@@ -80,7 +75,7 @@ function Register(props) {
 
               <div className="form-group register">
                 <label
-                  htmlFor="email"
+                  htmlFor="username"
                   className="cols-sm-2 control-label register-label"
                 >
                   Your Email
@@ -93,9 +88,9 @@ function Register(props) {
                     <input
                       type="email"
                       className="form-control register-input"
-                      name="email"
+                      name="username"
                       placeholder="Enter your Email"
-                      value={userDetails.email}
+                      value={userDetails.username}
                       onChange={handleChange}
                     />
                   </div>

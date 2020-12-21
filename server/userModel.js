@@ -16,10 +16,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     // eslint-disable-next-line no-useless-escape
     match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Invalid email format"],
-    required: [true, "Please enter your email."],
   },
   password: {
     type: String,
+    required: [true, "please enter password"],
   },
   googleId: String,
   facebookId: String,

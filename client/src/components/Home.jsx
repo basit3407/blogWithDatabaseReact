@@ -9,7 +9,7 @@ function Home(props) {
   const { _id } = useParams();
   const { handleError } = props;
 
-  const url = `http://localhost:5000/user/${_id}/home`;
+  const url = `/user/${_id}/home`;
 
   useEffect(() => {
     let isMounted = true;
