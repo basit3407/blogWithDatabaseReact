@@ -14,10 +14,12 @@ import ForgotEmail from "./components/ForgotPassword";
 
 function App() {
   const [error, setError] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   function handleErrors(statusCode, message) {
-    if (statusCode === 404 || statusCode === 500) setError(statusCode);
-    else setError(message);
+    statusCode === 404 || statusCode === 500
+      ? setError(statusCode)
+      : setError(message);
   }
 
   return (
@@ -29,7 +31,13 @@ function App() {
           exact
           path="/"
           render={(props) => (
-            <Login {...props} handleError={handleErrors} error={error} />
+            <Login
+              {...props}
+              handleError={handleErrors}
+              error={error}
+              loggedIn={loggedIn}
+              setLoggedIn={setLoggedIn}
+            />
           )}
         />
         <Route
@@ -43,7 +51,9 @@ function App() {
         <Route
           exact
           path="/user/:_id/home"
-          render={(props) => <Home {...props} handleError={handleErrors} />}
+          render={(props) => (
+            <Home {...props} handleError={handleErrors} loggedIn={loggedIn} />
+          )}
         />
         <Route exact path="/about" component={About} />
         <Route exact path="/contact" component={Contact} />
@@ -51,12 +61,20 @@ function App() {
           exact
           npm
           path="/user/:_id/posts/:postId"
-          render={(props) => <Post {...props} handleError={handleErrors} />}
+          render={(props) => (
+            <Post {...props} handleError={handleErrors} loggedIn={loggedIn} />
+          )}
         />
         <Route
           exact
           path="/user/:_id/add"
-          render={(props) => <Compose {...props} handleError={handleErrors} />}
+          render={(props) => (
+            <Compose
+              {...props}
+              handleError={handleErrors}
+              loggedIn={loggedIn}
+            />
+          )}
         />
         <Route exact path="/Error500" component={Error500} />
         <Route path="*" component={Error404} />

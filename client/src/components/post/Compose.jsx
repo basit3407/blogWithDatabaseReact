@@ -1,30 +1,28 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import React, { useState } from "react";
-import axios from "axios";
-import { Redirect, useParams } from "react-router";
+
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import {addPost} from "../../actions/postActions"
 
-function Compose(props) {
+export default function Compose() {
   const [post, setPost] = useState({ title: "", content: "" });
-  const [isSubmitted, setISSubmitted] = useState(false);
 
-  const { _id } = useParams();
-  const { handleError } = props;
 
-  const url = `/user/${_id}/add`;
+  function handleSubmit(e) {
 
-  function handleSubmit(event) {
-    axios
-      .post(`${url}/new`, post)
-      .then(() => {
-        setISSubmitted(true);
-      })
-      .catch((err) => {
-        console.error(err.response);
+    addPost(post,userId);
 
-        err.response.status === 409
+    
+    e.preventDefault();
+
+    
+    
+      
+        
+
+        error.stat === 409
           ? confirmAlert({
               title: "Confirm to Submit",
               message:
@@ -49,10 +47,9 @@ function Compose(props) {
                 },
               ],
             })
-          : handleError(err.reponse.status);
-      });
+         
 
-    event.preventDefault();
+  
   }
 
   function handleChange(event) {
@@ -68,6 +65,7 @@ function Compose(props) {
 
   return (
     <main>
+      {!loggedIn && <Redirect to="/" />}
       {isSubmitted && <Redirect to="/" />}
       <Header />
       <div className="container">
@@ -102,4 +100,6 @@ function Compose(props) {
   );
 }
 
-export default Compose;
+const getErrors =(state)=>state.errors;
+
+

@@ -1,7 +1,9 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
-const User = require("./userModel");
+
+// Load User Model
+const User = require("../models/userModel");
 
 module.exports = function () {
   // Local Strategy

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require("mongoose-findorcreate");
+const options = require("../config/options");
 
 const postSchema = {
   title: String,
@@ -8,24 +9,15 @@ const postSchema = {
 };
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please enter your name."],
-  },
-  username: {
-    type: String,
-    // eslint-disable-next-line no-useless-escape
-    match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Invalid email format"],
-  },
-  password: {
-    type: String,
-  },
+  name: String,
+  email: String,
+  password: String,
   googleId: String,
   facebookId: String,
   posts: [postSchema],
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, options);
 userSchema.plugin(findOrCreate);
 
 const User = mongoose.model("User", userSchema);

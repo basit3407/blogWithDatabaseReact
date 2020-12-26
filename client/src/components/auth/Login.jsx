@@ -1,15 +1,13 @@
-import Axios from "axios";
 import React, { useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
+import { loginUser } from "../../actions/authActions";
 
-function Login(props) {
+export default function Login() {
   const [enteredDetails, setEnteredDetails] = useState({
-    username: "",
+    email: "",
     password: "",
   });
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [userId, setUserId] = useState("");
-  const { error, handleError } = props;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -20,20 +18,17 @@ function Login(props) {
   }
 
   function handleSubmit(event) {
-    Axios.post(`/login`, enteredDetails)
-      .then((response) => {
-        setUserId(response.data);
-        setLoggedIn(true);
-      })
-      .catch((e) => {
-        handleError(e.response.status, e.response.data);
-      });
     event.preventDefault();
+    loginUser(enteredDetails);
+    if (loggedIn) history.push(`user/${userId}/home`);
   }
+
+  const error = useSelector(getErrors);
+  const { loggedIn, userId } = useSelector(getLoginStatus);
+  const history = useHistory();
 
   return (
     <div className="container">
-      {loggedIn && <Redirect to={`/user/${userId}/home`} />}
       <div className="row">
         <aside className="col-sm-4">
           <div className="card">
@@ -63,14 +58,15 @@ function Login(props) {
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <input
-                    name="username"
-                    value={enteredDetails.username}
+                    name="email"
+                    value={enteredDetails.email}
                     onChange={handleChange}
                     className="form-control"
                     placeholder="Email"
                     type="email"
                   ></input>
                 </div>
+                <span style={{ color: "red" }}>{error.email}</span>
                 <div className="form-group">
                   <input
                     className="form-control"
@@ -81,6 +77,7 @@ function Login(props) {
                     type="password"
                   ></input>
                 </div>
+                <span style={{ color: "red" }}>{error.password}</span>
                 <div className="row">
                   <div className="col-md-6">
                     <div className="form-group">
@@ -96,7 +93,6 @@ function Login(props) {
                     <Link className="small" to="/forgot">
                       Forgot password?
                     </Link>
-                    {error && <span style={{ color: "red" }}>{error}</span>}
                   </div>
                 </div>
               </form>
@@ -108,4 +104,5 @@ function Login(props) {
   );
 }
 
-export default Login;
+const getErrors = (state) => state.errors;
+const getLoginStatus = (state) => state.auth;

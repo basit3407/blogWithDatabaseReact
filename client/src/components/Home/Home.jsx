@@ -1,30 +1,15 @@
 import Header from "./Header";
 import Footer from "./Footer";
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import axios from "axios";
+import React from "react";
+import { Link, useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function Home(props) {
-  const [posts, setPosts] = useState([]);
-  const { _id } = useParams();
-  const { handleError } = props;
+export default function Home() {
+  const { posts, loggedIn, userId } = useSelector(getPosts);
 
-  const url = `/user/${_id}/home`;
+  const history = useHistory();
 
-  useEffect(() => {
-    let isMounted = true;
-    axios
-      .get(url)
-      .then((res) => {
-        if (isMounted) {
-          setPosts(res.data);
-        }
-      })
-      .catch((e) => console.log(e.response));
-    return () => {
-      isMounted = false;
-    };
-  }, [posts, handleError, url]);
+  if (!loggedIn) history.push("/login");
 
   return (
     <main>
@@ -50,7 +35,7 @@ function Home(props) {
               <h1>{post.title}</h1>
               <p>
                 {post.content.substring(0, 100) + " ..."}
-                <Link to={`/post/${post.title}`}>Read more</Link>
+                <Link to={`/user/${userId}/posts/${post._id}`}>Read more</Link>
               </p>
             </div>
           );
@@ -61,4 +46,4 @@ function Home(props) {
   );
 }
 
-export default Home;
+const getPosts = (state) => state.auth;

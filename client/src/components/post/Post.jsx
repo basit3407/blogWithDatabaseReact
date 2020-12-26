@@ -1,5 +1,5 @@
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
 import React, { useEffect, useState, useRef } from "react";
 import { Redirect, useParams } from "react-router";
 import axios from "axios";
@@ -33,7 +33,7 @@ function Post(props) {
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [editClicked, setEditClicked] = useState(false);
   const { _id, postId } = useParams();
-  const { handleError } = props;
+  const { handleError, loggedIn } = props;
   const url = `http://localhost5000/user/${_id}/posts/${postId}`;
 
   function handleClickDelete() {
@@ -146,6 +146,7 @@ function Post(props) {
 
   return (
     <main>
+      {!loggedIn && <Redirect to="/" />}
       {deleteClicked && <Redirect to="/" />}
 
       <Header />

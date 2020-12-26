@@ -1,15 +1,18 @@
-import Axios from "axios";
 import React, { useState } from "react";
-import { Redirect, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
+import { registerUser } from "../../actions/authActions";
+import { GET_ERRORS } from "../../actions/types.";
 
-function Register(props) {
+export default function Register() {
   const [userDetails, setUserDetails] = useState({
     name: "",
-    username: "",
+    email: "",
     password: "",
   });
-  const [isRegistered, setIsRegistered] = useState(false);
-  const { handleError, error } = props;
+
+  const error = useSelector(getErrors);
+  const dispatch = useDispatch();
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -22,22 +25,22 @@ function Register(props) {
   function handleSubmit(event) {
     document.getElementById("password").value ===
     document.getElementById("confirm").value
-      ? Axios.post(`/register`, userDetails)
-          .then((res) => {
-            console.log(res.data);
-            setIsRegistered(true);
-          })
-          .catch((e) => handleError(e.response.status, e.response.data.error))
-      : handleError(400, "Password and confirm password donot match");
+      ? registerUser(userDetails, history)
+      : dispatch({
+          type: GET_ERRORS,
+          payload: {
+            passwordMatch: "password should be equal to confirm password",
+          },
+        });
 
     event.preventDefault();
   }
 
+  const history = useHistory();
+
   return (
     <main className="register-main">
       <div className="container">
-        .data
-        {isRegistered && <Redirect to="/" />}
         <div className="row main">
           <div className="panel-heading">
             <div className="panel-title text-center">
@@ -68,12 +71,13 @@ function Register(props) {
                       onChange={handleChange}
                     />
                   </div>
+                  <span style={{ color: "red" }}>{error.name}</span>
                 </div>
               </div>
 
               <div className="form-group register">
                 <label
-                  htmlFor="username"
+                  htmlFor="email"
                   className="cols-sm-2 control-label register-label"
                 >
                   Your Email
@@ -86,12 +90,13 @@ function Register(props) {
                     <input
                       type="email"
                       className="form-control register-input"
-                      name="username"
+                      name="email"
                       placeholder="Enter your Email"
-                      value={userDetails.username}
+                      value={userDetails.email}
                       onChange={handleChange}
                     />
                   </div>
+                  <span style={{ color: "red" }}>{error.email}</span>
                 </div>
               </div>
 
@@ -117,6 +122,7 @@ function Register(props) {
                       placeholder="Enter your Password"
                     />
                   </div>
+                  <span style={{ color: "red" }}>{error.password}</span>
                 </div>
               </div>
 
@@ -137,9 +143,9 @@ function Register(props) {
                       placeholder="Confirm your Password"
                     />
                   </div>
+                  <span style={{ color: "red" }}>{error.passwordMatch}</span>
                 </div>
               </div>
-              {error && <span style={{ color: "red" }}>{error}</span>}
 
               <div className="form-group register">
                 <button
@@ -160,4 +166,4 @@ function Register(props) {
   );
 }
 
-export default Register;
+const getErrors = (state) => state.errors;
