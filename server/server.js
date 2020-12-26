@@ -7,8 +7,8 @@ const passport = require("passport");
 const cors = require("cors");
 const helmet = require("helmet");
 
-const facebookLogin = require("./Routes/facebookLogin");
-const googleLogin = require("./Routes/googleLogin");
+const facebookLogin = require("./Routes/api/facebookLogin");
+const googleLogin = require("./Routes/api/googleLogin");
 const user = require("./Routes/api/users");
 
 const port = 5000;

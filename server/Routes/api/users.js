@@ -2,9 +2,6 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 
-// Load authentication function
-const checkAuth = require("../../auth/checkAuth");
-
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
@@ -62,17 +59,6 @@ router.post("/login", (req, res, next) => {
           res.json(req.user);
         })
       : next(err);
-  });
-});
-
-//@route GET api/user/:userId/home
-// @desc data for home page of users
-// @access authenticated user
-router.get("/:userId/home", checkAuth, (req, res, next) => {
-  const { userId } = req.params;
-
-  User.findById(userId, (err, user) => {
-    !err ? res.json(user.posts) : next(err);
   });
 });
 

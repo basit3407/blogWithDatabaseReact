@@ -1,154 +1,77 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
-import React, { useEffect, useState, useRef } from "react";
-import { Redirect, useParams } from "react-router";
-import axios from "axios";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
-import Icon from "@material-ui/core/Icon";
+import React, { useState, useRef, useEffect } from "react";
+import { Button, Icon } from "@material-ui/core";
+import { DeleteIcon, EditIcon } from "@material-ui/icons";
+import { IconLabelButtons } from "../../material ui/materialUI";
+import { useHistory, useParams } from "react-router";
+import {
+  editPost,
+  addDuplicateConfirm,
+  deletePost,
+} from "../../actions/postActions";
+import { useSelector } from "react-redux";
+import { getUser } from "../Home/Home";
+import { getErrors } from "../auth/Register";
+import { confirm } from "../../confirmAlert/confirmAlert";
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(1),
-  },
-}));
-
-export function IconLabelButtons() {
-  const classes = useStyles();
-  return classes;
-}
-
-function Post(props) {
-  const [selectedPost, setSelectedPost] = useState({
-    title: "",
-    content: "",
-    _id: "",
-    _v: "",
-  });
-
-  const [deleteClicked, setDeleteClicked] = useState(false);
+export default function Post() {
   const [editClicked, setEditClicked] = useState(false);
-  const { _id, postId } = useParams();
-  const { handleError, loggedIn } = props;
-  const url = `http://localhost5000/user/${_id}/posts/${postId}`;
+  const [post, setPost] = useState({ title: "", content: "" });
+  const { postId } = useParams();
+  const { loggedIn, userId, posts } = useSelector(getUser);
 
-  function handleClickDelete() {
-    confirmAlert({
-      title: "Confirm to delete",
-      message: "Are you Sure",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => {
-            axios
-              .delete(url)
-              .then(() => {
-                setDeleteClicked(true);
-              })
-              .catch((error) => {
-                handleError(error.reponse.status);
-              });
-          },
-        },
-        {
-          label: "No",
-          onClick: () => setDeleteClicked(false),
-        },
-      ],
-    });
-  }
+  const history = useHistory();
+  const errors = useSelector(getErrors);
 
-  function handleChange(event) {
+  if (!loggedIn) history.push("/login");
+
+  useEffect(() => {
+    setPost(posts.find((post) => postId === post._id));
+  }, [posts, postId]);
+
+  const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setSelectedPost((prevPost) => {
-      return {
-        ...prevPost,
-        [name]: value,
-      };
+    setPost((prevVal) => {
+      return { ...prevVal, [name]: value };
     });
-  }
+  };
 
-  function handleClickEdit() {
+  const handleClickDelete = () => {
+    if (
+      confirm(
+        "Are you sure you want to delete this post",
+        "click yes to proceed"
+      ) === "yes"
+    )
+      deletePost(userId, postId, history);
+  };
+
+  const handleClickEdit = () => {
     setEditClicked(true);
-  }
+  };
 
-  function usePrevious(value) {
+  const usePrevious = (value) => {
     const ref = useRef();
     useEffect(() => {
       ref.current = value;
     });
     return ref.current;
-  }
+  };
 
-  const previousValue = usePrevious(selectedPost);
+  const previousValue = usePrevious(post);
 
-  function handleClickUpdate() {
-    previousValue !== selectedPost
-      ? axios
-          .put(`${url}/update`, selectedPost)
-          .then(() => {
-            axios
-              .get(`${url}/updated`)
-              .then((editedPost) => {
-                setSelectedPost(editedPost.data);
-                setEditClicked(false);
-              })
-              .catch((err) => handleError(err.reponse.status));
-          })
-          .catch((err) => {
-            err.response.status === 409
-              ? confirmAlert({
-                  title: "Confirm to Submit",
-                  message:
-                    "This title alredy exisits, Do you still want to submit it??",
-                  buttons: [
-                    {
-                      label: "Yes",
-                      onClick: () => {
-                        axios
-                          .put(`${url}/update/duplicate`, selectedPost)
-                          .then(() => {
-                            axios
-                              .get(`${url}/updated`)
-                              .then((editedPost) => {
-                                setSelectedPost(editedPost.data);
-                                setEditClicked(false);
-                              })
-                              .catch((err) => handleError(err.reponse.status));
-                          })
-                          .catch((err) => handleError(err.reponse.status));
-                      },
-                    },
-                    {
-                      label: "No",
-                      onClick: () => setEditClicked(true),
-                    },
-                  ],
-                })
-              : handleError(err.reponse.status);
-          })
-      : setEditClicked(false);
-  }
-
-  useEffect(() => {
-    axios
-      .get(`${url}`)
-      .then((res) => {
-        setSelectedPost(res.data);
-      })
-      .catch((err) => handleError(err.response.status));
-  }, [url, handleError]);
+  const handleClickUpdate = () => {
+    if (previousValue !== post) {
+      editPost(post, userId, "original", postId);
+      if (errors.status === 409)
+        addDuplicateConfirm("edit", post, userId, undefined, postId);
+    }
+  };
 
   return (
     <main>
-      {!loggedIn && <Redirect to="/" />}
-      {deleteClicked && <Redirect to="/" />}
-
       <Header />
       <div className="container">
         {editClicked ? (
@@ -156,14 +79,14 @@ function Post(props) {
             <label>Title</label>
             <input
               onChange={handleChange}
-              value={selectedPost.title}
+              value={post.title}
               type="text"
               name="title"
               className="form-control"
             ></input>
           </div>
         ) : (
-          <h1>{selectedPost.title}</h1>
+          <h1>{post.title}</h1>
         )}
 
         {editClicked ? (
@@ -172,14 +95,14 @@ function Post(props) {
             <textarea
               onChange={handleChange}
               className="form-control"
-              value={selectedPost.content}
+              value={post.content}
               name="content"
               rows="5"
               columns="30"
             ></textarea>
           </div>
         ) : (
-          <p>{selectedPost.content} </p>
+          <p>{post.content} </p>
         )}
 
         {editClicked ? (
@@ -223,5 +146,3 @@ function Post(props) {
     </main>
   );
 }
-
-export default Post;

@@ -14,15 +14,15 @@ export default function Register() {
   const error = useSelector(getErrors);
   const dispatch = useDispatch();
 
-  function handleChange(event) {
+  const handleChange = (event) => {
     const { name, value } = event.target;
 
     setUserDetails((prevVal) => {
       return { ...prevVal, [name]: value };
     });
-  }
+  };
 
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     document.getElementById("password").value ===
     document.getElementById("confirm").value
       ? registerUser(userDetails, history)
@@ -34,7 +34,7 @@ export default function Register() {
         });
 
     event.preventDefault();
-  }
+  };
 
   const history = useHistory();
 
@@ -166,4 +166,4 @@ export default function Register() {
   );
 }
 
-const getErrors = (state) => state.errors;
+export const getErrors = (state) => state.errors;

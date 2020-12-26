@@ -3,9 +3,10 @@ import { BrowserRouter } from "react-router-dom";
 import ReactDOM from "react-dom";
 
 import "./index.css";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import App from "./App";
 import { Provider } from "react-redux";
-import { Store } from "./store";
+import Store from "./store";
 
 ReactDOM.render(
   <Provider store={Store}>

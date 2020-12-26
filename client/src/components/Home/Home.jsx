@@ -5,7 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Home() {
-  const { posts, loggedIn, userId } = useSelector(getPosts);
+  const { posts, loggedIn, userId } = useSelector(getUser);
 
   const history = useHistory();
 
@@ -46,4 +46,4 @@ export default function Home() {
   );
 }
 
-const getPosts = (state) => state.auth;
+export const getUser = (state) => state.auth;

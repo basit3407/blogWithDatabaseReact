@@ -1,36 +1,29 @@
 import axios from "axios";
 import { GET_ERRORS, SET_LOGIN_STATUS, SET_CURRENT_USER } from "./types";
+import { setPosts } from "./postActions";
+import { url } from "./postActions";
 
 // Register User
 export const registerUser = (userData, history) => (dispatch) => {
   axios
-    .post("/register", userData)
+    .post(`${url}register`, userData)
     .then(() => history.push("/login"))
-    .catch((err) =>
-      dispatch({
-        type: GET_ERRORS,
-        payload: err.response.data,
-      })
-    );
+    .catch((e) => dispatch(saveErrors(e.response.data)));
 };
 
 // Login
 export const loginUser = (userData) => (dispatch) => {
   axios
-    .post("/login", userData)
+    .post(`${url}login`, userData)
     .then((res) => {
       // Set loggedIn Status
       if (res.status === 200) {
         dispatch(setLoginStatus(true));
-        dispatch(setCurrentUser(res.data));
+        dispatch(setCurrentUser(res.data._id));
+        dispatch(setPosts(res.data.posts));
       }
     })
-    .catch((err) =>
-      dispatch({
-        type: GET_ERRORS,
-        payload: err.response.data,
-      })
-    );
+    .catch((e) => dispatch(saveErrors(e.response.data)));
 };
 
 // Set logged in user
@@ -51,5 +44,13 @@ export const setLoginStatus = (flag) => {
   return {
     type: SET_LOGIN_STATUS,
     payload: flag,
+  };
+};
+
+// save Errors
+export const saveErrors = (errors) => {
+  return {
+    type: GET_ERRORS,
+    payload: errors,
   };
 };

@@ -69,9 +69,7 @@ router.post("/add/new", checkAuth, (req, res, next) => {
         res.status(409).json({ error: "This post title already existis" });
       } else {
         user.posts.push({ title: req.body.title, content: req.body.content });
-        user.save((error) =>
-          err ? next(error) : res.json("Post added sucessfully")
-        );
+        user.save((error, user) => (err ? next(error) : res.json(user.posts)));
       }
     } else {
       next(err);
@@ -99,9 +97,7 @@ router.post("/add/duplicate", (req, res, next) => {
         title: req.body.title,
         content: req.body.content,
       });
-      user.save((error) =>
-        error ? next(error) : res.json("duplicate post added")
-      );
+      user.save((error, user) => (error ? next(error) : res.json(user)));
     } else {
       next(err);
     }
@@ -111,7 +107,7 @@ router.post("/add/duplicate", (req, res, next) => {
 // @route PUT api/user/:userId/post/:postId/update
 // @desc saves updated post
 // @access Authenticated user
-router.put("/:postId/update", (req, res, next) => {
+router.put("/:postId/update/original", (req, res, next) => {
   // Form validation
   const { errors, isValid } = validatePostInput(req.body);
 
@@ -142,17 +138,15 @@ router.put("/:postId/update", (req, res, next) => {
           previousPost.title = req.body.title;
           previousPost.content = req.body.content;
 
-          user.save((error) =>
-            error ? next(error) : res.json("post updated successfully")
-          );
+          user.save((error, user) => (error ? next(error) : res.json(user)));
         }
       } else {
         const previousPost = user.posts.id(postId);
         previousPost.title = req.body.title;
         previousPost.content = req.body.content;
 
-        user.save((error) =>
-          error ? next(error) : res.json("post updated successfully")
+        user.save((error, user) =>
+          error ? next(error, user) : res.json(user)
         );
       }
     } else {
@@ -182,9 +176,7 @@ router.put("/:postId/update/duplicate", (req, res, next) => {
       previousPost.title = req.body.title;
       previousPost.content = req.body.content;
 
-      user.save((error) =>
-        error ? next(error) : res.json("updated post with duplicate title")
-      );
+      user.save((error, user) => (error ? next(error) : res.json(user)));
     }
   });
 });
@@ -199,7 +191,7 @@ router.delete("/:postId", (req, res, next) => {
     if (!err) {
       const deletedPost = user.posts.id(postId);
       deletedPost.remove();
-      user.save((error) => (error ? next(error) : res.json("post deleted")));
+      user.save((error, user) => (error ? next(error) : res.json(user)));
     } else {
       next(err);
     }

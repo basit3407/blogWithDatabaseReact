@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import { loginUser } from "../../actions/authActions";
+import { getErrors } from "../auth/Register";
 
 export default function Login() {
   const [enteredDetails, setEnteredDetails] = useState({
@@ -9,19 +10,19 @@ export default function Login() {
     password: "",
   });
 
-  function handleChange(event) {
+  const handleChange = (event) => {
     const { name, value } = event.target;
 
     setEnteredDetails((prevVal) => {
       return { ...prevVal, [name]: value };
     });
-  }
+  };
 
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
     loginUser(enteredDetails);
     if (loggedIn) history.push(`user/${userId}/home`);
-  }
+  };
 
   const error = useSelector(getErrors);
   const { loggedIn, userId } = useSelector(getLoginStatus);
@@ -104,5 +105,4 @@ export default function Login() {
   );
 }
 
-const getErrors = (state) => state.errors;
 const getLoginStatus = (state) => state.auth;

@@ -1,5 +1,9 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { SET_LOGIN_STATUS, SET_CURRENT_USER } from "../actions/types";
+import {
+  SET_LOGIN_STATUS,
+  SET_CURRENT_USER,
+  SET_POSTS,
+} from "../actions/types";
 
 const initialState = { loggedIn: false, userId: "", posts: [] };
 
@@ -13,8 +17,12 @@ export default function (state = initialState, action) {
     case SET_CURRENT_USER:
       return {
         ...state,
-        userId: action.payload._id,
-        posts: action.payload.posts,
+        userId: action.payload,
+      };
+    case SET_POSTS:
+      return {
+        ...state,
+        posts: action.payload,
       };
 
     default:
